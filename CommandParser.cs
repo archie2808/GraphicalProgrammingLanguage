@@ -11,7 +11,7 @@ namespace WindowsFormsApp1
     /// <summary>
     /// The <c>CommandParser</c> class is responsible for interpreting and executing user commands. 
     /// </summary>
-    class CommandParser 
+    public class CommandParser 
     {
         private Point penPosition;
         private Bitmap drawingSurface;
