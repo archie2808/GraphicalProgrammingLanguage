@@ -46,8 +46,8 @@ namespace WindowsFormsApp1
             command = command.Trim();
             if (string.IsNullOrEmpty(command))
             {
-                MessageBox.Show("no command to execute");
-                return;
+                throw new InvalidOperationException("no command to execute");
+                
             }
 
 
@@ -70,9 +70,8 @@ namespace WindowsFormsApp1
                     break;
 
                 default:
-                    outputTextBox.AppendText($"Unknown command: {action}\n");
-                    break;
-
+                    throw new InvalidOperationException($"unknown command: {action}");
+                
             }
 
         }
@@ -108,7 +107,7 @@ namespace WindowsFormsApp1
             }
             else
             {
-                outputTextBox.AppendText("invalid move to command. \n");
+                throw new ArgumentException("Invlaid 'moveto' command. Expected Format: 'moveto x y'");
             }
         }
 
@@ -133,7 +132,7 @@ namespace WindowsFormsApp1
             }
             else
             {
-                outputTextBox.AppendText("Invalid command");
+                throw new ArgumentException("Invlaid 'drawto' command. Expected Format: 'drawto x y'");
             }
         }
 

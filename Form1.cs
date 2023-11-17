@@ -48,8 +48,17 @@ namespace WindowsFormsApp1
         /// </remarks>
         private void button1_Click(object sender, EventArgs e)
         {
-            string command = textBox1.Text; // Get the command from textBox1
-            commandParser.ExecuteCommand(command); // Parses textBox2 for output
+            try
+            {
+                string command = textBox1.Text; // Get the command from textBox1
+                commandParser.ExecuteCommand(command);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); 
+
+            }
+               
 
         }
 
@@ -86,12 +95,19 @@ namespace WindowsFormsApp1
         /// If so, it retrieves the program commands from textBox2 and executes them using CommandParser</remarks>
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
-            string command = textBox1.Text;
-            if (command.Trim().ToLower() == "run")
+            try
             {
-                string program = textBox2.Text;
-                commandParser.ExecuteProgram(program);
+                string command = textBox1.Text;
+                if (command.Trim().ToLower() == "run")
+                {
+                    string program = textBox2.Text;
+                    commandParser.ExecuteProgram(program);
 
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -113,17 +129,24 @@ namespace WindowsFormsApp1
         {
             if (e.KeyCode == Keys.Enter)
             {
-                string command = textBox1.Text.Trim().ToLower();
-                if (command == "run")
+                try
                 {
-                    // Execute the program written in textBox2
-                    string program = textBox2.Text;
-                    commandParser.ExecuteProgram(program);
-                } 
-                else
+                    string command = textBox1.Text.Trim().ToLower();
+                    if (command == "run")
+                    {
+                        // Execute the program written in textBox2
+                        string program = textBox2.Text;
+                        commandParser.ExecuteProgram(program);
+                    }
+                    else
+                    {
+                        // Execute individual command
+                        commandParser.ExecuteCommand(command);
+                    }
+                }
+                catch (Exception ex)
                 {
-                    // Execute individual command
-                    commandParser.ExecuteCommand(command);
+                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
