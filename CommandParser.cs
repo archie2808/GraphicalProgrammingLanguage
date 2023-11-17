@@ -64,10 +64,7 @@ namespace WindowsFormsApp1
                     DrawToCommand(commandParts);
                     break;
 
-
-                case "run":
-                    ExecuteProgram(outputTextBox.Text);
-                    break;
+            
 
                 default:
                     throw new InvalidOperationException($"unknown command: {action}");
@@ -76,18 +73,6 @@ namespace WindowsFormsApp1
 
         }
 
-        /// <summary>
-        /// Executes a sequence of user commands provided as a multi-line string
-        /// </summary>
-        /// <param name="program">The string containing the commands to be executed</param>
-        public void ExecuteProgram(string program)
-        {
-            var commands = program.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (var command in commands)
-            {
-                ExecuteCommand(command);
-            }
-        }
 
         /// <summary>
         /// Processes the 'moveto' command, updating the pen position and drawing on the Bitmap
@@ -135,6 +120,7 @@ namespace WindowsFormsApp1
                 throw new ArgumentException("Invlaid 'drawto' command. Expected Format: 'drawto x y'");
             }
         }
+
 
         /// <summary>
         /// Draws a line on the drawing surface from a specified start point to an end point

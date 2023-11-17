@@ -43,35 +43,57 @@ namespace WindowsFormsApp1
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <remarks>
-        /// This method retrieves the command from textBox1, executes it using the command parser, and then reinitialises 
-        /// the command parser with the updated drawing surface
+        /// This method retrieves the command from textBox1. If the command is 'clear', it clears the drawing surface.
+        /// Otherwise, it executes the command using the command parser. This method also handles any exceptions that
+        /// might occur during command execution and displays an error message.
         /// </remarks>
         private void button1_Click(object sender, EventArgs e)
         {
             try
             {
-                string command = textBox1.Text; // Get the command from textBox1
-                commandParser.ExecuteCommand(command);
+                string command = textBox1.Text.Trim().ToLower(); // Get the command from textBox1
+
+                if (command == "clear")
+                {
+                    ClearDrawingSurface();
+                }
+                else
+                {
+                    commandParser.ExecuteCommand(command);
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); 
-
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-               
 
+        }
+
+        /// <summary>
+        /// Clears and resets drawing surface
+        /// </summary>
+        /// <remarks>
+        /// This method disposes of the current drawing surface and creates a new Bitmap with the same dimensions.
+        /// It then updates the PictureBox to reflect the cleared drawing surface. This method is called when the
+        /// 'clear' command is executed.
+        /// </remarks>
+        private void ClearDrawingSurface()
+        {
+            drawingSurface.Dispose();
+            drawingSurface = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+            pictureBox1.Image = drawingSurface;
+            pictureBox1.Refresh();
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
 
-        }
+        }                            
 
         private void pictureBox1_Click(object sender, EventArgs e)
         {
-
+            
         }
-
         /// <summary>
         /// Handles the Paint event of the picture box control
         /// </summary>
@@ -83,7 +105,7 @@ namespace WindowsFormsApp1
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
             e.Graphics.DrawImage(drawingSurface, 0, 0);
-            pictureBox1.Refresh();
+            Refresh();
         }
 
         /// <summary>
@@ -95,20 +117,7 @@ namespace WindowsFormsApp1
         /// If so, it retrieves the program commands from textBox2 and executes them using CommandParser</remarks>
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
-            try
-            {
-                string command = textBox1.Text;
-                if (command.Trim().ToLower() == "run")
-                {
-                    string program = textBox2.Text;
-                    commandParser.ExecuteProgram(program);
-
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            
         }
 
         private void textBox2_TextChanged(object sender, EventArgs e)
@@ -127,28 +136,7 @@ namespace WindowsFormsApp1
         /// </remarks>
         private void textBox1_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Enter)
-            {
-                try
-                {
-                    string command = textBox1.Text.Trim().ToLower();
-                    if (command == "run")
-                    {
-                        // Execute the program written in textBox2
-                        string program = textBox2.Text;
-                        commandParser.ExecuteProgram(program);
-                    }
-                    else
-                    {
-                        // Execute individual command
-                        commandParser.ExecuteCommand(command);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
+          
         }
     }
 }
