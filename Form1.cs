@@ -50,7 +50,7 @@ namespace WindowsFormsApp1
         {
             string command = textBox1.Text; // Get the command from textBox1
             commandParser.ExecuteCommand(command); // Parses textBox2 for output
-            commandParser = new CommandParser(textBox2, drawingSurface);
+
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -62,7 +62,7 @@ namespace WindowsFormsApp1
         {
 
         }
-        
+
         /// <summary>
         /// Handles the Paint event of the picture box control
         /// </summary>
@@ -77,14 +77,55 @@ namespace WindowsFormsApp1
             pictureBox1.Refresh();
         }
 
+        /// <summary>
+        /// Handles the text changed event of textBox1
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <remarks>This method checks if the text entered in textBox1 is the 'run' command
+        /// If so, it retrieves the program commands from textBox2 and executes them using CommandParser</remarks>
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
+            string command = textBox1.Text;
+            if (command.Trim().ToLower() == "run")
+            {
+                string program = textBox2.Text;
+                commandParser.ExecuteProgram(program);
 
+            }
         }
 
         private void textBox2_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        /// <summary>
+        /// Handles the key down event of textBox1
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <remarks>
+        /// This method triggers when the enter key is pressed, it checks the command entered is 'run' and will exectue any program within textBox2.
+        /// Otherwise it will treat the string value as an individual command to be executed. 
+        /// </remarks>
+        private void textBox1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                string command = textBox1.Text.Trim().ToLower();
+                if (command == "run")
+                {
+                    // Execute the program written in textBox2
+                    string program = textBox2.Text;
+                    commandParser.ExecuteProgram(program);
+                } 
+                else
+                {
+                    // Execute individual command
+                    commandParser.ExecuteCommand(command);
+                }
+            }
         }
     }
 }

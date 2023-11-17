@@ -11,7 +11,7 @@ namespace WindowsFormsApp1
     /// <summary>
     /// The <c>CommandParser</c> class is responsible for interpreting and executing user commands. 
     /// </summary>
-    public class CommandParser 
+    public class CommandParser
     {
         private Point penPosition;
         private Bitmap drawingSurface;
@@ -30,7 +30,7 @@ namespace WindowsFormsApp1
         {
             penPosition = new Point(0, 0);
             outputTextBox = output;
-            drawingSurface = surface; 
+            drawingSurface = surface;
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace WindowsFormsApp1
                 return;
             }
 
-            //split the command into parts
+
             string[] commandParts = command.Split(' ');
             string action = commandParts[0].ToLower();
 
@@ -59,15 +59,37 @@ namespace WindowsFormsApp1
                 case "moveto":
                     MoveToCommand(commandParts);
                     break;
-                    
+
+                case "drawto":
+                    DrawToCommand(commandParts);
+                    break;
+
+
+                case "run":
+                    ExecuteProgram(outputTextBox.Text);
+                    break;
 
                 default:
-                    outputTextBox.AppendText($"Unknown command: {action}\n"); 
+                    outputTextBox.AppendText($"Unknown command: {action}\n");
                     break;
+
             }
-            
+
         }
-        
+
+        /// <summary>
+        /// Executes a sequence of user commands provided as a multi-line string
+        /// </summary>
+        /// <param name="program">The string containing the commands to be executed</param>
+        public void ExecuteProgram(string program)
+        {
+            var commands = program.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var command in commands)
+            {
+                ExecuteCommand(command);
+            }
+        }
+
         /// <summary>
         /// Processes the 'moveto' command, updating the pen position and drawing on the Bitmap
         /// </summary>
@@ -78,7 +100,7 @@ namespace WindowsFormsApp1
         /// </remarks>
         private void MoveToCommand(string[] commandParts)
         {
-            if (commandParts.Length == 3 && int.TryParse(commandParts[1], out int x) && int.TryParse(commandParts[2], out int y)) 
+            if (commandParts.Length == 3 && int.TryParse(commandParts[1], out int x) && int.TryParse(commandParts[2], out int y))
             {
                 penPosition = new Point(x, y);
                 DrawOnBitmap();
@@ -89,6 +111,48 @@ namespace WindowsFormsApp1
                 outputTextBox.AppendText("invalid move to command. \n");
             }
         }
+
+        /// <summary>
+        /// This method processes the draw to command, drawing a line from the current pen position to the specified co-ordinates
+        /// </summary>
+        /// <param name="commandParts">The parts of the command, including the drawto keyword and the x and y co-ordinates</param>
+        /// <remarks>
+        /// This  method interprets the 'drawto' command, extracts the destination coordinates, and draws a line from the current pen position to these coordinates.
+        /// It updates the pen position to the new location after drawing the line.
+        /// If the command is invalid (e.g., incorrect number of arguments or non-numeric coordinates), an error message is displayed.
+        /// </remarks>
+        private void DrawToCommand(string[] commandParts)
+        {
+            if (commandParts.Length == 3 && int.TryParse(commandParts[1], out int x) && int.TryParse(commandParts[2], out int y))
+            {
+                Point newPenPosition = new Point(x, y);
+                DrawLine(penPosition, newPenPosition);
+                penPosition = newPenPosition;
+
+                outputTextBox.AppendText($"Line drawn to ({x}, {y})\n");
+            }
+            else
+            {
+                outputTextBox.AppendText("Invalid command");
+            }
+        }
+
+        /// <summary>
+        /// Draws a line on the drawing surface from a specified start point to an end point
+        /// </summary>
+        /// <param name="start">the starting point of a line</param>
+        /// <param name="end">the ending point of a line</param>
+        /// <remarks>
+        /// This method used a graphics object from the Bitmap to draw a line. 
+        /// </remarks>
+        private void DrawLine(Point start, Point end)
+        {
+            using (Graphics g = Graphics.FromImage(drawingSurface))
+            {
+                g.DrawLine(Pens.Black, start, end);
+            }
+        }
+    
         /// <summary>
         /// Draws on bitmaps surface at the current pen position
         /// </summary>
