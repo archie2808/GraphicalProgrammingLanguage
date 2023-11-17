@@ -164,7 +164,7 @@ namespace WindowsFormsApp1
         {
             using (Graphics g = Graphics.FromImage(drawingSurface))
             {
-                g.FillEllipse(Brushes.Red, penPosition.X - 2, penPosition.Y - 2, 4, 4);
+                g.FillEllipse(Brushes.Red, penPosition.X - 2, penPosition.Y - 2, 4, 4);  
             }
             
         }
