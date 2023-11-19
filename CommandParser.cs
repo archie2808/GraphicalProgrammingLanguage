@@ -11,6 +11,10 @@ namespace WindowsFormsApp1
     /// <summary>
     /// The <c>CommandParser</c> class is responsible for interpreting and executing user commands. 
     /// </summary>
+    /// <remarks>
+    /// the property provides access tothe current location of the pen, allowing external classes
+    /// to query its position
+    /// </remarks>
     public class CommandParser
     {
         private Point penPosition;
@@ -20,7 +24,7 @@ namespace WindowsFormsApp1
         /// <summary>
         /// Initializes a new instance of the <c>CommandParser</c> class.
         /// </summary>
-        /// <param name="output">The textbox control where output messages are displayed</param>
+        /// <param name="output">The textbox control 1where output messages are displayed</param>
         /// <param name="surface">The bitmap surface on which drawing commands are executed</param>
         /// <remarks>
         /// The constructor sets up the initial state of the Parser, including setting the initial pen position
@@ -94,7 +98,7 @@ namespace WindowsFormsApp1
             }
             else
             {
-                throw new ArgumentException("Invlaid 'moveto' command. Expected Format: 'moveto x y'");
+                throw new ArgumentException("Invalid 'moveto' command. Expected Format: 'moveto x y'");
             }
         }
 
@@ -141,6 +145,11 @@ namespace WindowsFormsApp1
 
             penPosition = new Point(0, 0);
             outputTextBox.AppendText("Pen position reset to top-left corner.\n");
+        }
+
+        public Point G()
+        {
+            return penPosition;
         }
 
 
