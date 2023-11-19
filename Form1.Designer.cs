@@ -33,12 +33,13 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
+            this.errorLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(91, 520);
+            this.textBox1.Location = new System.Drawing.Point(91, 542);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(436, 20);
             this.textBox1.TabIndex = 0;
@@ -86,12 +87,24 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
+            // errorLabel
+            // 
+            this.errorLabel.BackColor = System.Drawing.SystemColors.ActiveBorder;
+            this.errorLabel.Location = new System.Drawing.Point(91, 455);
+            this.errorLabel.Name = "errorLabel";
+            this.errorLabel.Size = new System.Drawing.Size(436, 62);
+            this.errorLabel.TabIndex = 5;
+            this.errorLabel.Text = "Error Report";
+            this.errorLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.errorLabel.Click += new System.EventHandler(this.label1_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.ClientSize = new System.Drawing.Size(1292, 1036);
+            this.Controls.Add(this.errorLabel);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.pictureBox1);
@@ -113,6 +126,7 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Label errorLabel;
     }
 }
 

@@ -64,7 +64,7 @@ namespace WindowsFormsApp1
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                errorLabel.Text = ex.Message;
             }
 
         }
@@ -137,6 +137,11 @@ namespace WindowsFormsApp1
         private void textBox1_KeyDown(object sender, KeyEventArgs e)
         {
           
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
