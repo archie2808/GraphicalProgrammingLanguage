@@ -49,7 +49,7 @@ namespace WindowsFormsApp1
                 throw new InvalidOperationException("no command to execute");
                 
             }
-
+             
 
             string[] commandParts = command.Split(' ');
             string action = commandParts[0].ToLower();
