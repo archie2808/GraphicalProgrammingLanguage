@@ -18,8 +18,9 @@ namespace WindowsFormsApp1
     public class CommandParser
     {
         private Point penPosition;
-        private Bitmap drawingSurface;
+        private readonly Bitmap drawingSurface;
         private readonly TextBox outputTextBox;
+        private readonly DrawingManager drawingManager;
 
         /// <summary>
         /// Initializes a new instance of the <c>CommandParser</c> class.
@@ -35,6 +36,7 @@ namespace WindowsFormsApp1
             penPosition = new Point(0, 0);
             outputTextBox = output;
             drawingSurface = surface;
+            drawingManager = new DrawingManager(surface);
         }
 
         /// <summary>
@@ -68,6 +70,10 @@ namespace WindowsFormsApp1
                     DrawToCommand(commandParts);
                     break;
 
+                case "rectangle":
+                    RectangleCommand(commandParts);
+                    break;
+
                 case "reset":
                     ResetCommand();
                     break;
@@ -79,7 +85,28 @@ namespace WindowsFormsApp1
 
         }
 
-
+        /// <summary>
+        /// Processes the rectangle command to draw a rectangle onto drawing surface
+        /// </summary>
+        /// <param name="commandParts"></param>
+        /// <remarks>
+        /// The method interprets the rectangle command, extracts the width and height parameters, 
+        /// and then calls the drawing manager to a rectangle. The rectangle is drawn with its top 
+        /// left corner at the current pen position
+        /// </remarks>
+        private void RectangleCommand(string[] commandParts)
+        {
+            if (commandParts.Length == 3 && int.TryParse(commandParts[1], out int width) && int.TryParse(commandParts[2], out int height))
+            {
+                drawingManager.DrawRectangle(penPosition, width, height);
+                outputTextBox.AppendText($"Rectangle drawn at ({penPosition.X}, {penPosition.Y}) with width {width} and height {height}");
+            }
+            else
+            {
+                throw new ArgumentException("invalid 'rectangle' command. Expected format: recatangle width height");
+            }
+        }
+       
         /// <summary>
         /// Processes the 'moveto' command, updating the pen position and drawing on the Bitmap
         /// </summary>
@@ -93,7 +120,7 @@ namespace WindowsFormsApp1
             if (commandParts.Length == 3 && int.TryParse(commandParts[1], out int x) && int.TryParse(commandParts[2], out int y))
             {
                 penPosition = new Point(x, y);
-                DrawOnBitmap();
+                drawingManager.DrawOnBitmap();
                 outputTextBox.AppendText($"Pen moved to ({x}, {y}). \n");
             }
             else
@@ -116,7 +143,7 @@ namespace WindowsFormsApp1
             if (commandParts.Length == 3 && int.TryParse(commandParts[1], out int x) && int.TryParse(commandParts[2], out int y))
             {
                 Point newPenPosition = new Point(x, y);
-                DrawLine(penPosition, newPenPosition);
+                drawingManager.DrawLine(penPosition, newPenPosition);
                 penPosition = newPenPosition;
 
                 outputTextBox.AppendText($"Line drawn to ({x}, {y})\n");
@@ -147,43 +174,7 @@ namespace WindowsFormsApp1
             outputTextBox.AppendText("Pen position reset to top-left corner.\n");
         }
 
-        public Point G()
-        {
-            return penPosition;
-        }
-
-
-        /// <summary>
-        /// Draws a line on the drawing surface from a specified start point to an end point
-        /// </summary>
-        /// <param name="start">the starting point of a line</param>
-        /// <param name="end">the ending point of a line</param>
-        /// <remarks>
-        /// This method used a graphics object from the Bitmap to draw a line. 
-        /// </remarks>
-        private void DrawLine(Point start, Point end)
-        {
-            using (Graphics g = Graphics.FromImage(drawingSurface))
-            {
-                g.DrawLine(Pens.Black, start, end);
-            }
-        }
-    
-        /// <summary>
-        /// Draws on bitmaps surface at the current pen position
-        /// </summary>
-        /// <remarks>
-        /// This method is called after updating the pen position to visually represent the pens's 
-        /// new location on the bitmap. It currently draws a small red circle at the pen position.
-        /// </remarks>
-        private void DrawOnBitmap()
-        {
-            using (Graphics g = Graphics.FromImage(drawingSurface))
-            {
-                g.FillEllipse(Brushes.Red, penPosition.X - 2, penPosition.Y - 2, 4, 4);  
-            }
-            
-        }
+       
       
 
     }
