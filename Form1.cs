@@ -45,7 +45,7 @@ namespace WindowsFormsApp1
         /// <remarks>
         /// This method retrieves the command from textBox1. If the command is 'clear', it clears the drawing surface.
         /// Otherwise, it executes the command using the command parser. This method also handles any exceptions that
-        /// might occur during command execution and displays an error message.
+        /// might occur during command execution and reports them to a user in a label UI element.
         /// </remarks>
         private void button1_Click(object sender, EventArgs e)
         {

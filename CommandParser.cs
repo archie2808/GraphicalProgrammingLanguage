@@ -74,6 +74,10 @@ namespace WindowsFormsApp1
                     RectangleCommand(commandParts);
                     break;
 
+                case "circle":
+                    CircleCommand(commandParts);
+                    break;
+
                 case "reset":
                     ResetCommand();
                     break;
@@ -83,6 +87,27 @@ namespace WindowsFormsApp1
                 
             }
 
+        }
+
+        /// <summary>
+        /// Processes the circle command to draw a circle on the drawing surface.
+        /// </summary>
+        /// <param name="commandParts"></param>
+        /// <remarks>
+        /// The method interprets the circle command, extracts the radius and calls the DrawCircle method 
+        /// to draw the circl on the drawing surface.
+        /// </remarks>
+        private void CircleCommand(string[] commandParts)
+        {
+            if (commandParts.Length == 2 && int.TryParse(commandParts[1], out int radius))
+            {
+                drawingManager.DrawCircle(penPosition, radius);
+                outputTextBox.AppendText($"Circle drawn with radius {radius}.\n");
+            }
+            else
+            {
+                throw new ArgumentException("Invalid 'circle' command. Expected Format: 'circle radius'");
+            }
         }
 
         /// <summary>

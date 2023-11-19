@@ -20,6 +20,46 @@ namespace WindowsFormsApp1
             drawingSurface = surface;
         
         }
+
+        /// <summary>
+        /// Draws Circle on the drawing surface
+        /// </summary>
+        /// <param name="center">The center point of the circle</param>
+        /// <param name="radius">The radius of the circles</param>
+        /// <remarks>
+        /// This method draws a circle based on the specified radius, it checks 
+        /// if the circle is within drawing surface bounds before execution. 
+        /// </remarks>
+        public void DrawCircle(Point center, int radius)
+        {
+            if (OutOfBoundsCircle(center, radius))
+            {
+                throw new ArgumentException("Circle Dimensions Out of bounds. Redraw circle Within bounds of drawing surface");
+            }
+
+            using (Graphics g = Graphics.FromImage(drawingSurface))
+            {
+                g.DrawEllipse(Pens.Blue, center.X - radius, center.Y - radius, radius * 2, radius * 2);
+            }
+        }
+
+        /// <summary>
+        /// Checks if a cirlce is out of the bounds of the drawing surface.
+        /// </summary>
+        /// <param name="center"></param>
+        /// <param name="radius"></param>
+        /// <returns>
+        /// This method determines whether, based on the given center and radius, 
+        /// would exceed the boundaries of the drawing surface.
+        /// </returns>
+        private bool OutOfBoundsCircle(Point center, int radius)
+        {
+            return (center.X - radius < 0) ||
+                   (center.Y - radius < 0) ||
+                   (center.X + radius > drawingSurface.Width) ||
+                   (center.Y + radius > drawingSurface.Height);
+        }
+
         /// <summary>
         /// Draws a Rectangle on the drawing surface
         /// </summary>
@@ -35,7 +75,7 @@ namespace WindowsFormsApp1
         {
             if (OutOfBoundsRectangle(startPosition, width, height))
             {
-                throw new ArgumentException("Rectangle dimensions out of bounds. Redraw rectangle within bounds of the Display Box");
+                throw new ArgumentException("Rectangle dimensions out of bounds. Redraw rectangle within bounds of the drawing surface.");
             }
             
             
@@ -44,6 +84,7 @@ namespace WindowsFormsApp1
                 g.DrawRectangle(Pens.Black, startPosition.X, startPosition.Y, width, height);
             }
         }
+
         /// <summary>
         /// Checks if the rectangle dimensions exceed the boundaries of the drawing surface
         /// </summary>
@@ -54,7 +95,7 @@ namespace WindowsFormsApp1
         /// Returns true if the rectangle is out of bounds, otherwise fails
         /// </returns>
         /// <remarks>
-        /// THe method calculates if the rectangle defined by the start position, width and height
+        /// The method calculates if the rectangle defined by the start position, width and height
         /// would extend beyond the edges of the drawing surface. It also checks if the start position is negative
         /// </remarks>
         private bool OutOfBoundsRectangle(Point startPosition, int width, int height)
@@ -63,7 +104,6 @@ namespace WindowsFormsApp1
                    startPosition.Y + height > drawingSurface.Height ||
                    startPosition.X < 0 || startPosition.Y < 0;
         }
-
 
         /// <summary>
         /// Draws a line on the drawing surface from a specified start point to an end point
