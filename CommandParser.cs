@@ -64,7 +64,9 @@ namespace WindowsFormsApp1
                     DrawToCommand(commandParts);
                     break;
 
-            
+                case "reset":
+                    ResetCommand();
+                    break;
 
                 default:
                     throw new InvalidOperationException($"unknown command: {action}");
@@ -119,6 +121,26 @@ namespace WindowsFormsApp1
             {
                 throw new ArgumentException("Invlaid 'drawto' command. Expected Format: 'drawto x y'");
             }
+        }
+
+        /// <summary>
+        /// Resets the pen position to the top left corner of the drawing surface.
+        /// </summary>
+        /// <remarks>
+        /// This method sets the pen position back to the origin (0,0).
+        /// it checks if the drawing surface is available before resetting the pen position, if not 
+        /// and invalid operation exception is thrown
+        /// </remarks>
+        private void ResetCommand()
+        {
+            if (drawingSurface == null)
+            {
+                throw new InvalidOperationException("Drawing Surface not available");
+                
+            }
+
+            penPosition = new Point(0, 0);
+            outputTextBox.AppendText("Pen position reset to top-left corner.\n");
         }
 
 
