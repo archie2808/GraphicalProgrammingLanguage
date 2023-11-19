@@ -95,7 +95,7 @@ namespace WindowsFormsApp1
         /// left corner at the current pen position
         /// </remarks>
         private void RectangleCommand(string[] commandParts)
-        {
+        { 
             if (commandParts.Length == 3 && int.TryParse(commandParts[1], out int width) && int.TryParse(commandParts[2], out int height))
             {
                 drawingManager.DrawRectangle(penPosition, width, height);
