@@ -14,13 +14,47 @@ namespace WindowsFormsApp1
     {
         private readonly Bitmap drawingSurface;
         private Point penPosition;
+        private Pen currentPen;
 
+        /// <summary>
+        /// Initialises a new instance of the Drawing manager class
+        /// </summary>
+        /// <param name="surface">The Bitmap surface</param>
+        /// <remarks>
+        /// Sets up the initial state of the drawing manager.
+        /// </remarks>
         public DrawingManager(Bitmap surface)
         {
             drawingSurface = surface;
+            currentPen = new Pen(Color.Blue);
         
         }
 
+        /// <summary>
+        /// Changes the colour of the pen. 
+        /// </summary>
+        /// <param name="colorName"></param>
+        /// <remarks>
+        /// The method changes the colour of the pen to the specified colour name.
+        /// If the colour name is not recognised, it throws an ArguementException
+        /// </remarks>
+        public void ChangePenColor(string colorName)
+        {
+            Color newColor;
+            
+            newColor = Color.FromName(colorName);
+            if (newColor.IsKnownColor)
+            {
+                currentPen = new Pen(newColor);
+            }
+                
+            else
+            {
+                throw new ArgumentException($"Unknown color: {colorName}");
+            }
+            
+
+        }
         /// <summary>
         /// Draws an equilateral triangle on the drawing surface
         /// </summary>
@@ -42,9 +76,9 @@ namespace WindowsFormsApp1
 
             using (Graphics g= Graphics.FromImage(drawingSurface))
             {
-                g.DrawLine(Pens.HotPink, startVertex, secondVertex);
-                g.DrawLine(Pens.HotPink, secondVertex, thirdVertex);
-                g.DrawLine(Pens.HotPink, thirdVertex, startVertex);
+                g.DrawLine(currentPen, startVertex, secondVertex);
+                g.DrawLine(currentPen, secondVertex, thirdVertex);
+                g.DrawLine(currentPen, thirdVertex, startVertex);
             }
         }
 
@@ -66,7 +100,7 @@ namespace WindowsFormsApp1
 
             using (Graphics g = Graphics.FromImage(drawingSurface))
             {
-                g.DrawEllipse(Pens.Blue, center.X - radius, center.Y - radius, radius * 2, radius * 2);
+                g.DrawEllipse(currentPen, center.X - radius, center.Y - radius, radius * 2, radius * 2);
             }
         }
 
@@ -108,7 +142,7 @@ namespace WindowsFormsApp1
             
             using (Graphics g = Graphics.FromImage(drawingSurface))
             {
-                g.DrawRectangle(Pens.Black, startPosition.X, startPosition.Y, width, height);
+                g.DrawRectangle(currentPen, startPosition.X, startPosition.Y, width, height);
             }
         }
 
@@ -144,7 +178,7 @@ namespace WindowsFormsApp1
         {
             using (Graphics g = Graphics.FromImage(drawingSurface))
             {
-                g.DrawLine(Pens.Black, start, end);
+                g.DrawLine(currentPen, start, end);
             }
         }
 

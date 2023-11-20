@@ -82,6 +82,10 @@ namespace WindowsFormsApp1
                     TriangleCommand(commandParts);
                     break;
 
+                case "colour":
+                    ColorCommand(commandParts);
+                    break;
+
                 case "reset":
                     ResetCommand();
                     break;
@@ -91,6 +95,29 @@ namespace WindowsFormsApp1
                 
             }
 
+        }
+
+        /// <summary>
+        /// Processes the 'colour' command to change the pens drawing colour
+        /// </summary>
+        /// <param name="commandParts"></param>
+        /// <remarks>
+        /// This method interprets the 'colour' command, extracts the colour name, and changes the pen colour in the drawing manager.
+        /// If the command is invalid (e.g., incorrect number of arguments or unrecognized colour name), an error message is displayed.
+        /// </remarks>
+        private void ColorCommand(string[] commandParts)
+        {
+            if (commandParts.Length == 2)
+            {
+                string colorName = commandParts[1];
+                drawingManager.ChangePenColor(colorName);
+                outputTextBox.AppendText($"Pen colour changed to {colorName}\n");
+            }
+
+            else
+            {
+                throw new ArgumentException("Invalid colour command, expected formal: 'colour [colourname]");
+            }
         }
 
         /// <summary>
