@@ -17,6 +17,7 @@ namespace WindowsFormsApp1
     public partial class Form1 : Form
     {
         private CommandParser commandParser;
+       
         private Bitmap drawingSurface;
         private string defaultDirectory;
 
@@ -134,14 +135,40 @@ namespace WindowsFormsApp1
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <remarks>
-        /// This method triggers when the enter key is pressed, it checks the command entered is 'run' and will exectue any program within textBox2.
-        /// Otherwise it will treat the string value as an individual command to be executed. 
+        /// This method is triggered when a key is pressed while textBox1 is focused.
+        /// If the Enter key is pressed, the method checks the command entered in textBox1.
+        /// If the command is 'run', it executes the script present in textBox2. 
+        /// For any other command, it is executed as a single command through the CommandParser. 
         /// </remarks>
         private void textBox1_KeyDown(object sender, KeyEventArgs e)
         {
-          
-        }
+            if (e.KeyCode == Keys.Enter)
+            {
+                string command = textBox1.Text.Trim().ToLower();
 
+                if (command == "run")
+                {
+                    
+                    string script = textBox2.Text;
+
+                   
+                    commandParser.ExecuteScript(script);
+                }
+                else
+                {
+           
+                    try
+                    {
+                        commandParser.ExecuteCommand(command);
+                    }
+                    catch (Exception ex)
+                    {
+                        errorLabel.Text = $"Error executing command '{command}': {ex.Message}";
+                        
+                    }
+                }
+            }
+        }
         private void label1_Click(object sender, EventArgs e)
         {
 
@@ -158,7 +185,7 @@ namespace WindowsFormsApp1
         private void saveScript_Click(object sender, EventArgs e)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "All Files (*.*)|*.*";
+            saveFileDialog.Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
             saveFileDialog.DefaultExt = "txt";
             saveFileDialog.AddExtension = true;
 

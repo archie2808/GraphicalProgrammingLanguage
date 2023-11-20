@@ -90,11 +90,47 @@ namespace WindowsFormsApp1
                     ResetCommand();
                     break;
 
+               
+
                 default:
                     throw new InvalidOperationException($"unknown command: {action}");
                 
             }
 
+        }
+
+        /// <summary>
+        /// Executes a series of commands provided in a script format
+        /// </summary>
+        /// <param name="script">The script containing the commands to be executed</param>
+        /// <remarks>
+        /// The method processes each line of the script as an individual command.
+        /// It trims any whitespace from each command before execution. 
+        /// If a command causes an exception, a Messagebox is displayed with error details. 
+        /// </remarks>
+        public void ExecuteScript(string script)
+        {
+            string[] commands = script.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string command in commands)
+            {
+                try
+                {
+                    
+                    string trimmedCommand = command.Trim();
+
+                    
+                    if (!string.IsNullOrEmpty(trimmedCommand))
+                    {
+                        ExecuteCommand(trimmedCommand);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error executing command '{command}': {ex.Message}", "Execution Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    break;
+                }
+            }
         }
 
         /// <summary>
