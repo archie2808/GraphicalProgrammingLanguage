@@ -66,7 +66,7 @@ namespace WindowsFormsApp1
                     commandParser.ExecuteCommand(command);
                 }
             }
-            catch (Exception ex)
+            catch (InvalidOperationException ex)
             {
                 errorLabel.Text = ex.Message;
             }
@@ -130,43 +130,53 @@ namespace WindowsFormsApp1
         }
 
         /// <summary>
+        /// Processes a given command string. If the command is 'run', it executes a script from textbox2
+        /// otherwise it executes the command using the commandParser
+        /// </summary>
+        /// <param name="command"></param>
+        /// <remarks>
+        /// This method abstracts the command processing logic away from the UI event, making it more testable
+        /// </remarks>
+        public void ProcessRunCommand(string command)
+        {
+            if (command == "run")
+            {
+
+                string script = textBox2.Text;
+
+
+                commandParser.ExecuteScript(script);
+            }
+            else
+            {
+
+                try
+                {
+                    commandParser.ExecuteCommand(command);
+                }
+                catch (Exception ex)
+                {
+                    errorLabel.Text = $"Error executing command '{command}': {ex.Message}";
+
+                }
+            }
+        }
+        /// <summary>
         /// Handles the key down event of textBox1
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <remarks>
-        /// This method is triggered when a key is pressed while textBox1 is focused.
-        /// If the Enter key is pressed, the method checks the command entered in textBox1.
-        /// If the command is 'run', it executes the script present in textBox2. 
-        /// For any other command, it is executed as a single command through the CommandParser. 
+        /// This event handler captures the Enter key press in textBox1 and initiates the processing of the command
+        /// entered by the user. The actual command processing logic is delegated to the ProcessCommand method
         /// </remarks>
         private void textBox1_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
                 string command = textBox1.Text.Trim().ToLower();
-
-                if (command == "run")
-                {
-                    
-                    string script = textBox2.Text;
-
-                   
-                    commandParser.ExecuteScript(script);
-                }
-                else
-                {
-           
-                    try
-                    {
-                        commandParser.ExecuteCommand(command);
-                    }
-                    catch (Exception ex)
-                    {
-                        errorLabel.Text = $"Error executing command '{command}': {ex.Message}";
-                        
-                    }
-                }
+                    ProcessRunCommand(command);
+                
             }
         }
         private void label1_Click(object sender, EventArgs e)

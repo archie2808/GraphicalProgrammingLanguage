@@ -17,11 +17,11 @@ namespace WindowsFormsApp1
     /// </remarks>
     public class CommandParser
     {
-        private Point penPosition;
+        public Point penPosition;
         private readonly Bitmap drawingSurface;
         private readonly TextBox outputTextBox;
         private readonly DrawingManager drawingManager;
-
+     
         /// <summary>
         /// Initializes a new instance of the <c>CommandParser</c> class.
         /// </summary>
@@ -152,7 +152,7 @@ namespace WindowsFormsApp1
 
             else
             {
-                throw new ArgumentException("Invalid colour command, expected formal: 'colour [colourname]");
+                throw new ArgumentException("Invalid colour command, expected format: 'colour [colourname]");
             }
         }
 
@@ -236,8 +236,9 @@ namespace WindowsFormsApp1
         {
             if (commandParts.Length == 3 && int.TryParse(commandParts[1], out int x) && int.TryParse(commandParts[2], out int y))
             {
-                penPosition = new Point(x, y);
-                drawingManager.DrawOnBitmap();
+                Point newPenPosition = new Point(x, y);
+                drawingManager.DrawLine(penPosition, newPenPosition); // Use current and new pen positions
+
                 outputTextBox.AppendText($"Pen moved to ({x}, {y}). \n");
             }
             else
@@ -288,10 +289,9 @@ namespace WindowsFormsApp1
             }
 
             penPosition = new Point(0, 0);
+         
             outputTextBox.AppendText("Pen position reset to top-left corner.\n");
         }
-
-       
       
 
     }

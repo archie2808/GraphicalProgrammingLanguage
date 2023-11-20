@@ -13,7 +13,6 @@ namespace WindowsFormsApp1
     public class DrawingManager
     {
         private readonly Bitmap drawingSurface;
-        private Point penPosition;
         private Pen currentPen;
 
         /// <summary>
@@ -29,7 +28,7 @@ namespace WindowsFormsApp1
             currentPen = new Pen(Color.Blue);
         
         }
-
+       
         /// <summary>
         /// Changes the colour of the pen. 
         /// </summary>
@@ -189,13 +188,6 @@ namespace WindowsFormsApp1
         /// This method is called after updating the pen position to visually represent the pens's 
         /// new location on the bitmap. It currently draws a small red circle at the pen position.
         /// </remarks>
-        public void DrawOnBitmap()
-        {
-            using (Graphics g = Graphics.FromImage(drawingSurface))
-            {
-                g.FillEllipse(Brushes.Red, penPosition.X - 2, penPosition.Y - 2, 4, 4);
-            }
 
-        }
     }
 }
