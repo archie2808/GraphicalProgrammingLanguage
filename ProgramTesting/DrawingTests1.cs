@@ -79,10 +79,15 @@ namespace ProgramTesting
             }
 
             /// <summary>
-            /// needs implementing correctly
+            /// Tests functionality of rest command
             /// </summary>
+            /// <remarks>
+            /// This test verifies that the Reset Command correctly resets the pen position to the origin (0, 0).
+            /// The test first moves the pen to a non-origin position (10, 10) and then executes the reset command.
+            /// It asserts that the pen position is reset to (0, 0) after the reset command is executed.
+            /// </remarks>
             [TestMethod]
-            public void TestResetCommand()
+            public void ResetCommand_ResetsPen()
             {
                 // Arrange
                 var outputTextBox = new TextBox();
@@ -96,7 +101,7 @@ namespace ProgramTesting
 
                 // Assert
                 Assert.AreEqual(new Point(0, 0), commandParser.penPosition, "The pen position should be reset to (0, 0)");
-
+                   
             }
         }
     }

@@ -230,14 +230,14 @@ namespace WindowsFormsApp1
         /// <param name="commandParts">The parameters of the commanf, such as the co-oridinates</param>
         /// <remarks>
         /// This method updates the pen position based on the coordinates provided in the command.
-        /// it then calls on <c>DrawOnBitmap</c> to reflect this change on the drwaing surface.
+        /// 
         /// </remarks>
         private void MoveToCommand(string[] commandParts)
         {
             if (commandParts.Length == 3 && int.TryParse(commandParts[1], out int x) && int.TryParse(commandParts[2], out int y))
             {
                 Point newPenPosition = new Point(x, y);
-                drawingManager.DrawLine(penPosition, newPenPosition); // Use current and new pen positions
+                
 
                 outputTextBox.AppendText($"Pen moved to ({x}, {y}). \n");
             }
@@ -264,7 +264,7 @@ namespace WindowsFormsApp1
                 drawingManager.DrawLine(penPosition, newPenPosition);
                 penPosition = newPenPosition;
 
-                outputTextBox.AppendText($"Line drawn to ({x}, {y})\n");
+                outputTextBox.AppendText($"Line drawn to ({x}, {y})\n"); 
             }
             else
             {
