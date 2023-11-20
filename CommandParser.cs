@@ -78,6 +78,10 @@ namespace WindowsFormsApp1
                     CircleCommand(commandParts);
                     break;
 
+                case "triangle":
+                    TriangleCommand(commandParts);
+                    break;
+
                 case "reset":
                     ResetCommand();
                     break;
@@ -87,6 +91,31 @@ namespace WindowsFormsApp1
                 
             }
 
+        }
+
+        /// <summary>
+        /// Process the triangle command to draw a triangle on the drawing surface.
+        /// </summary>
+        /// <param name="commandParts"></param>
+        /// <remarks>
+        /// This methods interprets the 'triangle' command, extracts the base co-ordinates and length, and 
+        /// instructs the drawing manager to draw a triangle. Throws excpetion if triangle command is not inputted correctly.
+        /// </remarks>
+        private void TriangleCommand(string[] commandParts)
+        {
+            if (commandParts.Length == 3 && int.TryParse(commandParts[1], out int x) && int.TryParse(commandParts[2], out int y))
+            {
+                Point startVertex = new Point(x, y);
+                int sideLength = 100;
+
+                drawingManager.DrawTriangle(startVertex, sideLength);
+                outputTextBox.AppendText($"Triangle drawn with starting vertex at ({x} , {y}).\n");
+            }
+
+            else
+            {
+                throw new ArgumentException("Invalid 'triangle' command. Expected Format: triangle x y");
+            }
         }
 
         /// <summary>

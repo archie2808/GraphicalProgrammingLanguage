@@ -22,6 +22,33 @@ namespace WindowsFormsApp1
         }
 
         /// <summary>
+        /// Draws an equilateral triangle on the drawing surface
+        /// </summary>
+        /// <param name="startVertex">The starting point of the triangles base</param>
+        /// <param name="sideLength">The length of each side of the triangle</param>
+        /// <remarks>
+        /// This method draws a triangle with a specified base starting point and side length.
+        /// The triangle is always oriented such that the base is horizontal.
+        /// </remarks>
+        public void DrawTriangle(Point startVertex, int sideLength)
+        {
+            Point secondVertex = new Point(
+                startVertex.X - (int)(sideLength * Math.Cos(Math.PI / 3)),
+                startVertex.Y + (int)(sideLength * Math.Sin(Math.PI / 3)));
+
+            Point thirdVertex = new Point(
+                startVertex.X + (int)(sideLength * Math.Cos(Math.PI / 3)),
+                secondVertex.Y);
+
+            using (Graphics g= Graphics.FromImage(drawingSurface))
+            {
+                g.DrawLine(Pens.HotPink, startVertex, secondVertex);
+                g.DrawLine(Pens.HotPink, secondVertex, thirdVertex);
+                g.DrawLine(Pens.HotPink, thirdVertex, startVertex);
+            }
+        }
+
+        /// <summary>
         /// Draws Circle on the drawing surface
         /// </summary>
         /// <param name="center">The center point of the circle</param>
