@@ -15,31 +15,28 @@ namespace ProgramTesting
         {
 
             /// <summary>
-            /// Tests the MoveToCommand method in the CommandParser class.
+            /// Tests the MoveToCommand method in the CommandParser class to ensure the pen position is being moved as required
             /// </summary>
             /// <remarks>
-            /// This test verifies that executing the 'moveto' command correctly changes the color of the specified pixel on the drawing surface.
-            /// The test checks if the pixel at the coordinates (50, 50) turns red after executing the command. 
+            /// This test verifies that when a moveto command is called, the pen position is being correctly moved to the approprite destination
             /// </remarks>
             [TestMethod]
-            public void TestMoveToCommand()
+            public void MoveToCommand_MovesPen()
             {
                 // Arrange
                 var outputTextBox = new TextBox();
-                var drawingSurface = new Bitmap(100, 100);
+                var drawingSurface = new Bitmap(50, 50);
                 var commandParser = new CommandParser(outputTextBox, drawingSurface);
-                string command = "moveto 50 50";
+
 
                 // Act
-                commandParser.ExecuteCommand(command); // Move pen position
+                commandParser.ExecuteCommand("moveto 10 10");
+                
 
                 // Assert
-                int expectedColor = Color.Red.ToArgb();
-                int actualColor = drawingSurface.GetPixel(50, 50).ToArgb();
+                Assert.AreEqual(new Point(10, 10), commandParser.PenPosition, "The pen position should be moved to (10, 10)");
 
-                Assert.AreEqual(expectedColor, actualColor);
             }
-
             /// <summary>
             /// Tests the Clear command functionality in the form class
             /// </summary>
@@ -100,7 +97,7 @@ namespace ProgramTesting
                 commandParser.ExecuteCommand("reset");
 
                 // Assert
-                Assert.AreEqual(new Point(0, 0), commandParser.penPosition, "The pen position should be reset to (0, 0)");
+                Assert.AreEqual(new Point(0, 0), commandParser.PenPosition, "The pen position should be reset to (0, 0)");
                    
             }
         }

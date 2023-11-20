@@ -17,10 +17,16 @@ namespace WindowsFormsApp1
     /// </remarks>
     public class CommandParser
     {
-        public Point penPosition;
+        private Point penPosition;
         private readonly Bitmap drawingSurface;
         private readonly TextBox outputTextBox;
         private readonly DrawingManager drawingManager;
+
+        public Point PenPosition
+        {
+            get {return penPosition; }
+            
+        }
      
         /// <summary>
         /// Initializes a new instance of the <c>CommandParser</c> class.
@@ -236,10 +242,9 @@ namespace WindowsFormsApp1
         {
             if (commandParts.Length == 3 && int.TryParse(commandParts[1], out int x) && int.TryParse(commandParts[2], out int y))
             {
-                Point newPenPosition = new Point(x, y);
-                
+                this.penPosition = new Point(x, y);
 
-                outputTextBox.AppendText($"Pen moved to ({x}, {y}). \n");
+                 outputTextBox.AppendText($"Pen moved to ({x}, {y}). \n");
             }
             else
             {
