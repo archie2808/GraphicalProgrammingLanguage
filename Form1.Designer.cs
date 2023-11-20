@@ -34,12 +34,14 @@
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.errorLabel = new System.Windows.Forms.Label();
+            this.saveScript = new System.Windows.Forms.Button();
+            this.loadScript = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(91, 542);
+            this.textBox1.Location = new System.Drawing.Point(91, 727);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(436, 20);
             this.textBox1.TabIndex = 0;
@@ -48,7 +50,7 @@
             // 
             // textBox2
             // 
-            this.textBox2.Location = new System.Drawing.Point(91, 60);
+            this.textBox2.Location = new System.Drawing.Point(91, 229);
             this.textBox2.Multiline = true;
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(436, 393);
@@ -59,7 +61,7 @@
             // 
             this.pictureBox1.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox1.Location = new System.Drawing.Point(718, 60);
+            this.pictureBox1.Location = new System.Drawing.Point(737, 229);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(471, 393);
             this.pictureBox1.TabIndex = 2;
@@ -69,7 +71,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(91, 568);
+            this.button1.Location = new System.Drawing.Point(94, 764);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 3;
@@ -79,7 +81,7 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(180, 568);
+            this.button2.Location = new System.Drawing.Point(200, 764);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(75, 23);
             this.button2.TabIndex = 4;
@@ -90,7 +92,7 @@
             // errorLabel
             // 
             this.errorLabel.BackColor = System.Drawing.SystemColors.ActiveBorder;
-            this.errorLabel.Location = new System.Drawing.Point(91, 455);
+            this.errorLabel.Location = new System.Drawing.Point(91, 625);
             this.errorLabel.Name = "errorLabel";
             this.errorLabel.Size = new System.Drawing.Size(436, 62);
             this.errorLabel.TabIndex = 5;
@@ -98,12 +100,34 @@
             this.errorLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.errorLabel.Click += new System.EventHandler(this.label1_Click);
             // 
+            // saveScript
+            // 
+            this.saveScript.Location = new System.Drawing.Point(94, 176);
+            this.saveScript.Name = "saveScript";
+            this.saveScript.Size = new System.Drawing.Size(75, 23);
+            this.saveScript.TabIndex = 6;
+            this.saveScript.Text = "Save\r\n";
+            this.saveScript.UseVisualStyleBackColor = true;
+            this.saveScript.Click += new System.EventHandler(this.saveScript_Click);
+            // 
+            // loadScript
+            // 
+            this.loadScript.Location = new System.Drawing.Point(200, 176);
+            this.loadScript.Name = "loadScript";
+            this.loadScript.Size = new System.Drawing.Size(75, 23);
+            this.loadScript.TabIndex = 7;
+            this.loadScript.Text = "Load";
+            this.loadScript.UseVisualStyleBackColor = true;
+            this.loadScript.Click += new System.EventHandler(this.loadScript_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.ClientSize = new System.Drawing.Size(1292, 1036);
+            this.Controls.Add(this.loadScript);
+            this.Controls.Add(this.saveScript);
             this.Controls.Add(this.errorLabel);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
@@ -127,6 +151,8 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Label errorLabel;
+        private System.Windows.Forms.Button saveScript;
+        private System.Windows.Forms.Button loadScript;
     }
 }
 

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 
 namespace WindowsFormsApp1
 {
@@ -17,6 +18,7 @@ namespace WindowsFormsApp1
     {
         private CommandParser commandParser;
         private Bitmap drawingSurface;
+        private string defaultDirectory;
 
         /// <summary>
         /// Initialized a new instance of the <c>Form1</c> class
@@ -31,6 +33,7 @@ namespace WindowsFormsApp1
             drawingSurface = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             pictureBox1.Image = drawingSurface;
             commandParser = new CommandParser(textBox2, drawingSurface);
+            defaultDirectory = @"C:\Users\archi\OneDrive - Leeds Beckett University\YEAR 3\ASE\SCRIPTS"; 
         }
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -142,6 +145,47 @@ namespace WindowsFormsApp1
         private void label1_Click(object sender, EventArgs e)
         {
 
+        }
+
+        /// <summary>
+        /// Handles the click event of a save button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <remarks>
+        /// The method opens a Save File dialog allowing the user to save the contents of textBox2 to a .txt file
+        /// </remarks>
+        private void saveScript_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "All Files (*.*)|*.*";
+            saveFileDialog.DefaultExt = "txt";
+            saveFileDialog.AddExtension = true;
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                File.WriteAllText(saveFileDialog.FileName, textBox2.Text);
+            }
+        }
+
+        /// <summary>
+        /// Handles the click event of the load button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <remarks>
+        /// The method opens a Open File dialog allowing the user to load a file from their file directory
+        /// </remarks>
+        private void loadScript_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.InitialDirectory = defaultDirectory;
+            openFileDialog.Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                textBox2.Text = File.ReadAllText(openFileDialog.FileName);
+            }
         }
     }
 }
