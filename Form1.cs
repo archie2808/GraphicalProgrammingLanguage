@@ -36,6 +36,53 @@ namespace WindowsFormsApp1
             commandParser = new CommandParser(textBox2, drawingSurface);
             defaultDirectory = @"C:\Users\archi\OneDrive - Leeds Beckett University\YEAR 3\ASE\SCRIPTS"; 
         }
+
+
+        /// <summary>
+        /// Refreshes the drawing surface for testing purposes.
+        /// </summary>
+        /// <remarks>
+        /// This method is used to refresh the PictureBox control that displays the drawing surface.
+        /// It's particularly useful in a testing context where the visual state of the drawing surface needs to be updated
+        /// to reflect changes made during tests. This method ensures that the latest state of the Bitmap is rendered in the PictureBox.
+        public void RefreshDrawingSurfaceForTest()
+        {
+            pictureBox1.Refresh();
+        }
+
+        /// <summary>
+        /// Sets a new drawing surface for testing purposes.
+        /// </summary>
+        /// <param name="newSurface">The new Bitmap to be used as the drawing surface.</param>
+        /// <remarks>
+        /// This method is used in a testing context to replace the current drawing surface with a new one.
+        /// It disposes of the existing drawing surface if it exists, and then sets the provided Bitmap as the new drawing surface.
+        /// This is particularly useful for unit tests that require a fresh drawing surface or specific conditions for the surface.
+        /// </remarks>
+        public void SetDrawingSurfaceForTest(Bitmap newSurface)
+        {
+            if (drawingSurface != null)
+            {
+                drawingSurface.Dispose();
+            }
+
+            drawingSurface = newSurface;
+            pictureBox1.Image = drawingSurface;
+
+        }
+
+        /// <summary>
+        /// Sets the script text for testing purposes.
+        /// </summary>
+        /// <param name="script">The script to be set in the text box.</param>
+        /// <remarks>
+        /// This method is intended for use in unit tests. It allows for programmatically setting the script text
+        /// in textBox2, which is used to simulate user input of a script in a testing environment.
+        /// </remarks>
+        public void SetScriptForTest(string script)
+        {
+            textBox2.Text = script;
+        }
         private void Form1_Load(object sender, EventArgs e)
         {
 

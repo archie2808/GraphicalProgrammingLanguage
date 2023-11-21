@@ -152,7 +152,7 @@ namespace WindowsFormsApp1
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error executing command '{command}': {ex.Message}", "Execution Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Console.WriteLine($"error {ex}");
                     break;
                 }
             }
