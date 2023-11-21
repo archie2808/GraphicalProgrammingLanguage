@@ -117,7 +117,8 @@ namespace ProgramTesting
         /// Test circle command by verifying colour of pixels
         /// </summary>
         /// <remarks>
-        /// The method verifys
+        /// The method moves the pen to a specified location and draws a circle, it then checks if the 
+        /// pixels at the edge of the circle have the specified colour
         /// </remarks>
         [TestMethod]
         public void CircleCommand_DrawsCircle()
