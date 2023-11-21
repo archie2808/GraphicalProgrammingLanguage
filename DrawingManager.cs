@@ -10,9 +10,12 @@ using System.Windows.Forms;
 
 namespace WindowsFormsApp1
 {
+    /// <summary>
+    /// Manages drawing operations on a SubClass
+    /// </summary>
     public class DrawingManager
     {
-        private readonly Bitmap drawingSurface;
+        private Bitmap drawingSurface;
         private Pen currentPen;
 
         /// <summary>
@@ -27,6 +30,17 @@ namespace WindowsFormsApp1
             drawingSurface = surface;
             currentPen = new Pen(Color.Blue);
         
+        }
+
+        /// <summary>
+        /// Updates the drawing surface with a new Bitmap.
+        /// </summary>
+        /// <param name="newSurface">The new Bitmap to be used as the drawing surface.</param>
+        public void UpdateDrawingSurface(Bitmap newSurface)
+        {
+
+        
+            drawingSurface = newSurface;
         }
        
         /// <summary>
@@ -181,13 +195,7 @@ namespace WindowsFormsApp1
             }
         }
 
-        /// <summary>
-        /// Draws on bitmaps surface at the current pen position
-        /// </summary>
-        /// <remarks>
-        /// This method is called after updating the pen position to visually represent the pens's 
-        /// new location on the bitmap. It currently draws a small red circle at the pen position.
-        /// </remarks>
+      
 
     }
 }

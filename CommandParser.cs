@@ -11,21 +11,39 @@ namespace WindowsFormsApp1
     /// <summary>
     /// The <c>CommandParser</c> class is responsible for interpreting and executing user commands. 
     /// </summary>
-    /// <remarks>
-    /// the property provides access tothe current location of the pen, allowing external classes
-    /// to query its position
-    /// </remarks>
+   
     public class CommandParser
     {
         private Point penPosition;
-        private readonly Bitmap drawingSurface;
-        private readonly TextBox outputTextBox;
-        private readonly DrawingManager drawingManager;
+        private Bitmap drawingSurface;
+        private TextBox outputTextBox;
+        private DrawingManager drawingManager;
 
+        /// <summary>
+        /// Gets the current position of the pen at the drawing surface
+        /// </summary>
+        /// <remarks>
+        /// the property provides access to the current location of the pen, allowing external classes
+        /// to query its position
+        /// </remarks>
         public Point PenPosition
         {
             get {return penPosition; }
             
+        }
+
+        /// <summary>
+        /// Updates the drawing surface with a new Bitmap. 
+        /// </summary>
+        /// <param name="newSurface">The new Bitmap to be set as drawing surface</param>
+        /// <remarks>
+        /// This method replaces the current drawing surface with the provided bitmap image. It is paticuarly
+        /// important in maintaining properfunctionality of the clear command. The Method delegates the
+        /// Update operation to the drawing manager class
+        /// </remarks>
+        public void UpdateDrawingSurface(Bitmap newSurface)
+        {
+            drawingManager.UpdateDrawingSurface(newSurface);
         }
      
         /// <summary>
@@ -54,7 +72,8 @@ namespace WindowsFormsApp1
         /// and executes the corresponding action. It also handles invalid commands.
         /// </remarks>
         public void ExecuteCommand(string command)
-        {
+        { 
+
             command = command.Trim();
             if (string.IsNullOrEmpty(command))
             {
@@ -147,13 +166,13 @@ namespace WindowsFormsApp1
         /// This method interprets the 'colour' command, extracts the colour name, and changes the pen colour in the drawing manager.
         /// If the command is invalid (e.g., incorrect number of arguments or unrecognized colour name), an error message is displayed.
         /// </remarks>
-        private void ColorCommand(string[] commandParts)
+        private void ColourCommand(string[] commandParts)
         {
             if (commandParts.Length == 2)
             {
-                string colorName = commandParts[1];
-                drawingManager.ChangePenColor(colorName);
-                outputTextBox.AppendText($"Pen colour changed to {colorName}\n");
+                string colourName = commandParts[1];
+                drawingManager.ChangePenColor(colourName);
+                outputTextBox.AppendText($"Pen colour changed to {colourName}\n");
             }
 
             else
@@ -193,7 +212,7 @@ namespace WindowsFormsApp1
         /// <param name="commandParts"></param>
         /// <remarks>
         /// The method interprets the circle command, extracts the radius and calls the DrawCircle method 
-        /// to draw the circl on the drawing surface.
+        /// to draw the circle on the drawing surface.
         /// </remarks>
         private void CircleCommand(string[] commandParts)
         {
@@ -297,6 +316,7 @@ namespace WindowsFormsApp1
          
             outputTextBox.AppendText("Pen position reset to top-left corner.\n");
         }
+
       
 
     }

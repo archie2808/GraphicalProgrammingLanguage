@@ -10,24 +10,20 @@ namespace ProgramTesting
     [TestClass]
     public class CommandParsingTests
     {
-        private CommandParser commandParser;
-        private TextBox outputTextbox;
+        private TextBox outputTextBox;
         private Bitmap drawingSurface;
-
+        private CommandParser commandParser;
 
 
         [TestInitialize]
-        public void Setup()
+        public void Initialise()
         {
-            outputTextbox = new TextBox();
-            drawingSurface = new Bitmap(100, 100);
-            commandParser = new CommandParser(outputTextbox, drawingSurface);
+            // Arrange
+            outputTextBox = new TextBox();
+            drawingSurface = new Bitmap(50, 50);
+            commandParser = new CommandParser(outputTextBox, drawingSurface);
 
         }
-
-
-
-
 
         /// <summary>
         /// A test method for verifying line by line reading and execution of commands
@@ -39,9 +35,6 @@ namespace ProgramTesting
         public void ExecuteCommand_SimpleCommand_UpdatesOutputTextBox()
         {
             // Arrange
-            var outputTextBox = new TextBox();
-            var drawingSurface = new Bitmap(100, 100);
-            var commandParser = new CommandParser(outputTextBox, drawingSurface);
             string command = "moveto 10 10";
 
             // Act

@@ -25,8 +25,8 @@ namespace WindowsFormsApp1
         /// Initialized a new instance of the <c>Form1</c> class
         /// </summary>
         /// <remarks>
-        /// This constructor intializes the componenents of the form, sets up the drawing surface,
-        /// and creates an instance of the Command Parser class
+        /// This constructor intializes the componenents of the form, sets up the drawing surface, 
+        /// sets default directory for loading and saving files and creates an instance of the Command Parser class
         /// </remarks>
         public Form1()
         {
@@ -55,7 +55,7 @@ namespace WindowsFormsApp1
         {
             try
             {
-                string command = textBox1.Text.Trim().ToLower(); // Get the command from textBox1
+                string command = textBox1.Text.Trim().ToLower(); 
 
                 if (command == "clear")
                 {
@@ -87,6 +87,8 @@ namespace WindowsFormsApp1
             drawingSurface = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             pictureBox1.Image = drawingSurface;
             pictureBox1.Refresh();
+            commandParser.UpdateDrawingSurface(drawingSurface);
+            
         }
 
         private void button2_Click(object sender, EventArgs e)
