@@ -26,6 +26,15 @@ namespace ProgramTesting
             drawingSurface = new Bitmap(500, 500);
             commandParser = new CommandParser(outputTextBox, drawingSurface);
         }
+        /// <summary>
+        /// Tests whether the 'ExecuteCommand' method throws an InvalidOperationException
+        /// when an invalid command is passed. 
+        /// </summary>
+        /// <remarks>
+        /// This test verifies the error handling capability
+        /// of the command parsing logic, ensuring that it correctly identifies and rejects
+        /// unrecognized commands.
+        /// </remarks>
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void InvalidCommandThrowsException()
@@ -36,5 +45,45 @@ namespace ProgramTesting
             //Act
             commandParser.ExecuteCommand(command);
         }
+
+        /// <summary>
+        /// Tests the behavior of the ExecuteCommand method when provided with a command that has too many parameters.
+        /// </summary>
+        /// <remarks>
+        /// An ArgumentException is expected to be thrown in this scenario.
+        /// </remarks>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void CommandWithTooFewParametersThrowsException()
+        {
+            // Arrange
+            string command = "moveto 100"; 
+            var commandParser = new CommandParser(outputTextBox, drawingSurface);
+
+            // Act
+            commandParser.ExecuteCommand(command);
+
+           
+        }
+        // <summary>
+        /// Tests the behavior of the ExecuteCommand method when provided with a command that has too many parameters.
+        /// </summary>
+        /// <remarks>
+        /// An ArgumentException is expected to be thrown in this scenario.
+        /// </remarks>
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void CommandWithTooManyParametersThrowsException()
+        {
+            // Arrange
+            string command = "circle 100 100 200"; 
+            var commandParser = new CommandParser(outputTextBox, drawingSurface);
+
+            // Act
+            commandParser.ExecuteCommand(command);
+
+            
+        }
+
     }
 }
