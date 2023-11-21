@@ -108,8 +108,8 @@ namespace ProgramTesting
 
             // Assert
             Assert.AreEqual(expectedColor, drawingSurface.GetPixel(startPosition.X, startPosition.Y).ToArgb(), "Top left corner should be coloured");
-            Assert.AreEqual(expectedColor, drawingSurface.GetPixel(startPosition.X + width - 1, startPosition.Y).ToArgb(), "Top right corner should be coloured");
-            Assert.AreEqual(expectedColor, drawingSurface.GetPixel(startPosition.X, startPosition.Y + height - 1).ToArgb(), "Bottom left corner should be coloured");
+            Assert.AreEqual(expectedColor, drawingSurface.GetPixel(startPosition.X + width , startPosition.Y).ToArgb(), "Top right corner should be coloured");
+            Assert.AreEqual(expectedColor, drawingSurface.GetPixel(startPosition.X, startPosition.Y + height ).ToArgb(), "Bottom left corner should be coloured");
 
         }
 
@@ -176,7 +176,38 @@ namespace ProgramTesting
             Assert.AreEqual(expectedColour, drawingSurface.GetPixel(thirdVertex.X, thirdVertex.Y).ToArgb(), "Pixel should be colored at the third vertex of the triangle");
         }
 
-       
+        /// <summary>
+        /// Tests the ColourCommand by drawing with one colour, changing the colour, and then drawing again.
+        /// </summary>
+        /// <remarks>
+        /// the method asserts that the pixels in the first line are of the initial color and
+        /// the pixels in the second line are of the new color. Draws in one colour from the start point to to mid point, changes colour then draws line to end point
+        /// </remarks>
+        [TestMethod]
+        public void ColourCommand_ChangesPenColour()
+        {
+            // Arrange
+            var initialColour = Color.Blue.ToArgb(); 
+            var newColourName = "Red";
+            var newColour = Color.Red.ToArgb();
+            var startPoint = new Point(10, 10);
+            var midPoint = new Point(20, 10); 
+            var endPoint = new Point(30, 10);
+
+            // Act
+            // Draw the first line with the initial color
+            commandParser.ExecuteCommand($"moveto {startPoint.X} {startPoint.Y}");
+            commandParser.ExecuteCommand($"drawto {midPoint.X} {midPoint.Y}");
+            commandParser.ExecuteCommand($"colour {newColourName}");
+
+            // Draw the second line with the new color
+            commandParser.ExecuteCommand($"drawto {endPoint.X} {endPoint.Y}");
+
+            // Assert
+            Assert.AreEqual(initialColour, drawingSurface.GetPixel(startPoint.X , startPoint.Y).ToArgb(), "Pixel should be initial color in the first line");
+            Assert.AreEqual(newColour, drawingSurface.GetPixel(midPoint.X , midPoint.Y).ToArgb(), "Pixel should be new color in the second line");
+        }
+
     }
 }
 
