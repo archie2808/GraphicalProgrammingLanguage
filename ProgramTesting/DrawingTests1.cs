@@ -20,7 +20,7 @@ namespace ProgramTesting
             {
                 // Arrange
                 outputTextBox = new TextBox();
-                drawingSurface = new Bitmap(100, 100);
+                drawingSurface = new Bitmap(500, 500);
                 commandParser = new CommandParser(outputTextBox, drawingSurface);
                 
             }
@@ -111,6 +111,35 @@ namespace ProgramTesting
             Assert.AreEqual(expectedColor, drawingSurface.GetPixel(startPosition.X + width - 1, startPosition.Y).ToArgb(), "Top right corner should be coloured");
             Assert.AreEqual(expectedColor, drawingSurface.GetPixel(startPosition.X, startPosition.Y + height - 1).ToArgb(), "Bottom left corner should be coloured");
             
+        }
+
+        /// <summary>
+        /// Test circle command by verifying colour of pixels
+        /// </summary>
+        /// <remarks>
+        /// The method verifys
+        /// </remarks>
+        [TestMethod]
+        public void CircleCommand_DrawsCircle()
+        {
+            // Arrange
+            var center = new Point(200, 200);
+            int radius = 10;
+            var expectedColour = Color.Blue.ToArgb();
+
+
+            //Act
+            commandParser.ExecuteCommand("moveto 200 200 ");
+            commandParser.ExecuteCommand($"circle {radius}");
+            
+
+            // Assert
+            
+            Assert.AreEqual(expectedColour, drawingSurface.GetPixel(center.X + radius, center.Y).ToArgb(), "Pixel on the right edge of the circle should be coloured");
+            Assert.AreEqual(expectedColour, drawingSurface.GetPixel(center.X, center.Y + radius).ToArgb(), "Pixel on the bottom edge of the circle should be coloured");
+            Assert.AreEqual(expectedColour, drawingSurface.GetPixel(center.X - radius, center.Y).ToArgb(), "Pixel on the left edge of the circle should be coloured");
+            Assert.AreEqual(expectedColour, drawingSurface.GetPixel(center.X, center.Y - radius).ToArgb(), "Pixel on the top edge of the circle should be coloured");
+
         }
     }
 }

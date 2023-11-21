@@ -108,7 +108,7 @@ namespace WindowsFormsApp1
                     break;
 
                 case "colour":
-                    ColorCommand(commandParts);
+                    ColourCommand(commandParts);
                     break;
 
                 case "reset":
@@ -240,7 +240,7 @@ namespace WindowsFormsApp1
         { 
             if (commandParts.Length == 3 && int.TryParse(commandParts[1], out int width) && int.TryParse(commandParts[2], out int height))
             {
-                drawingManager.DrawRectangle(penPosition, width, height);
+                drawingManager.DrawRectangle(PenPosition, width, height);
                 outputTextBox.AppendText($"Rectangle drawn at ({penPosition.X}, {penPosition.Y}) with width {width} and height {height}");
             }
             else

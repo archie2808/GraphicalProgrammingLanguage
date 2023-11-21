@@ -106,9 +106,12 @@ namespace WindowsFormsApp1
         /// </remarks>
         public void DrawCircle(Point center, int radius)
         {
+            
+            
+
             if (OutOfBoundsCircle(center, radius))
             {
-                throw new ArgumentException("Circle Dimensions Out of bounds. Redraw circle Within bounds of drawing surface");
+                throw new ArgumentException("Circle dimensions out of bounds. Redraw the circle within the bounds of the drawing surface.");
             }
 
             using (Graphics g = Graphics.FromImage(drawingSurface))
