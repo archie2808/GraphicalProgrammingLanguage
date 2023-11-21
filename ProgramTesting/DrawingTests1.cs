@@ -14,77 +14,77 @@ namespace ProgramTesting
         private Bitmap drawingSurface;
         private CommandParser commandParser;
 
-       
-            [TestInitialize]
-            public void Initialise()
-            {
-                // Arrange
-                outputTextBox = new TextBox();
-                drawingSurface = new Bitmap(500, 500);
-                commandParser = new CommandParser(outputTextBox, drawingSurface);
-                
-            }
-            /// <summary>
-            /// Tests the MoveToCommand method in the CommandParser class to ensure the pen position is being moved as required
-            /// </summary>
-            /// <remarks>
-            /// This test verifies that when a moveto command is called, the pen position is being correctly moved to the approprite destination
-            /// </remarks>
-            [TestMethod]
-            public void MoveToCommand_MovesPen()
-            {
-                // Act
-                commandParser.ExecuteCommand("moveto 10 10");
-                
 
-                // Assert
-                Assert.AreEqual(new Point(10, 10), commandParser.PenPosition, "The pen position should be moved to (10, 10)");
+        [TestInitialize]
+        public void Initialise()
+        {
+            // Arrange
+            outputTextBox = new TextBox();
+            drawingSurface = new Bitmap(500, 500);
+            commandParser = new CommandParser(outputTextBox, drawingSurface);
 
-            }
+        }
+        /// <summary>
+        /// Tests the MoveToCommand method in the CommandParser class to ensure the pen position is being moved as required
+        /// </summary>
+        /// <remarks>
+        /// This test verifies that when a moveto command is called, the pen position is being correctly moved to the approprite destination
+        /// </remarks>
+        [TestMethod]
+        public void MoveToCommand_MovesPen()
+        {
+            // Act
+            commandParser.ExecuteCommand("moveto 10 10");
 
-            /// <summary>
-            /// Tests the 'drawto' command of the CommandParser.
-            /// </summary>
-            /// <remarks>
-            /// This test verifies that the 'drawto' command correctly draws a line from the current
-            /// pen position to a specified point. It moves the pen to a starting position, executes
-            /// the 'drawto' command to a new position, and then checks if the pixel at the new position
-            /// has the expected color, indicating that the line was drawn correctly.
-            /// </remarks>
-            [TestMethod]
-            public void DrawToCommand_DrawsCorrectly()
-            {
-         
-                var expectedColour = Color.Blue.ToArgb();
 
-                // Act
-                commandParser.ExecuteCommand("drawto 10 10");
+            // Assert
+            Assert.AreEqual(new Point(10, 10), commandParser.PenPosition, "The pen position should be moved to (10, 10)");
 
-                //Assert
-                int actualColor = drawingSurface.GetPixel(10, 10).ToArgb();
-                Assert.AreEqual(expectedColour, actualColor, "Pixel at (10, 10) should be colored after drawto command");
-            }
-          
-            /// <summary>
-            /// Tests functionality of rest command
-            /// </summary>
-            /// <remarks>
-            /// This test verifies that the Reset Command correctly resets the pen position to the origin (0, 0).
-            /// The test first moves the pen to a non-origin position (10, 10) and then executes the reset command.
-            /// It asserts that the pen position is reset to (0, 0) after the reset command is executed.
-            /// </remarks>
-            [TestMethod]
-            public void ResetCommand_ResetsPen()
-            {
-            
-                // Act
-                commandParser.ExecuteCommand("moveto 10 10");
-                commandParser.ExecuteCommand("reset");
+        }
 
-                // Assert
-                Assert.AreEqual(new Point(0, 0), commandParser.PenPosition, "The pen position should be reset to (0, 0)");
-           
-            }
+        /// <summary>
+        /// Tests the 'drawto' command of the CommandParser.
+        /// </summary>
+        /// <remarks>
+        /// This test verifies that the 'drawto' command correctly draws a line from the current
+        /// pen position to a specified point. It moves the pen to a starting position, executes
+        /// the 'drawto' command to a new position, and then checks if the pixel at the new position
+        /// has the expected color, indicating that the line was drawn correctly.
+        /// </remarks>
+        [TestMethod]
+        public void DrawToCommand_DrawsCorrectly()
+        {
+
+            var expectedColour = Color.Blue.ToArgb();
+
+            // Act
+            commandParser.ExecuteCommand("drawto 10 10");
+
+            //Assert
+            int actualColor = drawingSurface.GetPixel(10, 10).ToArgb();
+            Assert.AreEqual(expectedColour, actualColor, "Pixel at (10, 10) should be colored after drawto command");
+        }
+
+        /// <summary>
+        /// Tests functionality of rest command
+        /// </summary>
+        /// <remarks>
+        /// This test verifies that the Reset Command correctly resets the pen position to the origin (0, 0).
+        /// The test first moves the pen to a non-origin position (10, 10) and then executes the reset command.
+        /// It asserts that the pen position is reset to (0, 0) after the reset command is executed.
+        /// </remarks>
+        [TestMethod]
+        public void ResetCommand_ResetsPen()
+        {
+
+            // Act
+            commandParser.ExecuteCommand("moveto 10 10");
+            commandParser.ExecuteCommand("reset");
+
+            // Assert
+            Assert.AreEqual(new Point(0, 0), commandParser.PenPosition, "The pen position should be reset to (0, 0)");
+
+        }
         /// <summary>
         /// Tests the rectangle command of the command parser
         /// </summary>
@@ -96,11 +96,11 @@ namespace ProgramTesting
         public void RectangleCommand_DrawsRectangle()
         {
             // Arrange
-            var expectedColor = Color.Blue.ToArgb(); 
+            var expectedColor = Color.Blue.ToArgb();
             Point startPosition = new Point(50, 50);
             int width = 10, height = 10;
 
-            
+
             commandParser.ExecuteCommand($"moveto {startPosition.X} {startPosition.Y}");
 
             // Act
@@ -110,7 +110,7 @@ namespace ProgramTesting
             Assert.AreEqual(expectedColor, drawingSurface.GetPixel(startPosition.X, startPosition.Y).ToArgb(), "Top left corner should be coloured");
             Assert.AreEqual(expectedColor, drawingSurface.GetPixel(startPosition.X + width - 1, startPosition.Y).ToArgb(), "Top right corner should be coloured");
             Assert.AreEqual(expectedColor, drawingSurface.GetPixel(startPosition.X, startPosition.Y + height - 1).ToArgb(), "Bottom left corner should be coloured");
-            
+
         }
 
         /// <summary>
@@ -132,19 +132,53 @@ namespace ProgramTesting
             //Act
             commandParser.ExecuteCommand("moveto 200 200 ");
             commandParser.ExecuteCommand($"circle {radius}");
-            
+
 
             // Assert
-            
+
             Assert.AreEqual(expectedColour, drawingSurface.GetPixel(center.X + radius, center.Y).ToArgb(), "Pixel on the right edge of the circle should be coloured");
             Assert.AreEqual(expectedColour, drawingSurface.GetPixel(center.X, center.Y + radius).ToArgb(), "Pixel on the bottom edge of the circle should be coloured");
             Assert.AreEqual(expectedColour, drawingSurface.GetPixel(center.X - radius, center.Y).ToArgb(), "Pixel on the left edge of the circle should be coloured");
             Assert.AreEqual(expectedColour, drawingSurface.GetPixel(center.X, center.Y - radius).ToArgb(), "Pixel on the top edge of the circle should be coloured");
 
         }
+
+        /// <summary>
+        /// Tests the Triangle command by drawing a triangle and veryfying the colour of the pixels at the vertices
+        /// </summary>
+        /// <remarks>
+        /// This test method arranges a scenario where a triangle is drawn on a graphical surface. It then asserts
+        /// that the pixels at the calculated vertices of the triangle are colored as expected.
+        /// </remarks>
+        [TestMethod]
+        public void TriangleCommand_DrawsTriangle()
+        {
+            // Arrange
+            var startVertex = new Point(100, 100);
+            int sideLength = 100;
+            var expectedColour = Color.Blue.ToArgb();
+
+            Point secondVertex = new Point(
+                startVertex.X - (int)(sideLength * Math.Cos(Math.PI / 3)),
+                startVertex.Y + (int)(sideLength * Math.Sin(Math.PI / 3)));
+
+            Point thirdVertex = new Point(
+                startVertex.X + (int)(sideLength * Math.Cos(Math.PI / 3)),
+                secondVertex.Y);
+
+            // Act
+            commandParser.ExecuteCommand($"triangle {startVertex.X} {startVertex.Y}");
+
+            // Assert
+
+            Assert.AreEqual(expectedColour, drawingSurface.GetPixel(startVertex.X, startVertex.Y).ToArgb(), "Pixel should be colored at the start vertex of the triangle");
+            Assert.AreEqual(expectedColour, drawingSurface.GetPixel(secondVertex.X, secondVertex.Y).ToArgb(), "Pixel should be colored at the second vertex of the triangle");
+            Assert.AreEqual(expectedColour, drawingSurface.GetPixel(thirdVertex.X, thirdVertex.Y).ToArgb(), "Pixel should be colored at the third vertex of the triangle");
+        }
+
+       
     }
 }
-
 
 
 
