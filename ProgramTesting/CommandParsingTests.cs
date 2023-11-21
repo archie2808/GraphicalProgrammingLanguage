@@ -20,7 +20,7 @@ namespace ProgramTesting
         {
             // Arrange
             outputTextBox = new TextBox();
-            drawingSurface = new Bitmap(50, 50);
+            drawingSurface = new Bitmap(500, 500);
             commandParser = new CommandParser(outputTextBox, drawingSurface);
 
         }
@@ -29,20 +29,19 @@ namespace ProgramTesting
         /// A test method for verifying line by line reading and execution of commands
         /// </summary>
         /// <remarks>
-        /// The method expects acknowledgment and execution of a provided Command.
+        /// The method expects acknowledgment and execution of a draw to command. verifies exectution by checking pixels of the drawing surface.
         /// </remarks>
         [TestMethod]
-        public void ExecuteCommand_SimpleCommand_UpdatesOutputTextBox()
+        public void ExecuteCommands_In_CommandLine()
         {
-            // Arrange
-            string command = "moveto 10 10";
+            var expectedColour = Color.Blue.ToArgb();
 
             // Act
-            commandParser.ExecuteCommand(command);
+            commandParser.ExecuteCommand("drawto 10 10");
 
-            // Assert
-            string expectedOutput = "Pen moved to (10, 10).";
-            Assert.IsTrue(outputTextBox.Text.Contains(expectedOutput));
+            //Assert
+            int actualColor = drawingSurface.GetPixel(10, 10).ToArgb();
+            Assert.AreEqual(expectedColour, actualColor, "Pixel at (10, 10) should be colored after drawto command");
         }
 
 
