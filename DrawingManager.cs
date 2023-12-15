@@ -148,7 +148,7 @@ namespace WindowsFormsApp1
         /// it checks if the rectangle dimensions are within the bounds of the drawing surface.
         /// if the Rectangle is out of bound, an ArgumentException is thrown
         /// </remarks>
-        public void DrawRectangle(Point startPosition, int width, int height)
+        public void DrawRectangle(Point startPosition, int width, int height) 
         {
             if (OutOfBoundsRectangle(startPosition, width, height))
             {
