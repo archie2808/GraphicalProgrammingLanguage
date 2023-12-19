@@ -18,6 +18,7 @@ namespace WindowsFormsApp1
         private Bitmap drawingSurface;
         private TextBox outputTextBox;
         private DrawingManager drawingManager;
+        private VariableManager variableManager;
 
         /// <summary>
         /// Gets the current position of the pen at the drawing surface
@@ -61,6 +62,7 @@ namespace WindowsFormsApp1
             outputTextBox = output;
             drawingSurface = surface;
             drawingManager = new DrawingManager(surface);
+            variableManager = new VariableManager();
         }
 
         /// <summary>
@@ -80,7 +82,14 @@ namespace WindowsFormsApp1
                 throw new InvalidOperationException("no command to execute");
                 
             }
-             
+
+            
+            if (command.Contains("="))
+            {
+                variableManager.ProcessVariableAssignment(command);
+                return;
+            }
+
 
             string[] commandParts = command.Split(' ');
             string action = commandParts[0].ToLower();

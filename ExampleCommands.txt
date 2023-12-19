@@ -1,0 +1,66 @@
+//These are example programs in GPL
+//Just copy them into the program area (minus comments)
+//program with errors
+red = 0
+size = 1
+xmoveto 200,200
+xwhile red < 255
+	colour red,0
+	circle size
+	size = size + 1
+	red = redx + 1
+endwhile
+
+//program without errors
+red = 0
+size = 1
+moveto 200,200
+while red < 255
+	colour red,0,0
+	circle size
+	size = size + 1
+	red = red + 1
+endwhile
+
+
+x = 100
+y = 100
+num1 = 25
+num2 = 25
+while num1 < 200
+	moveto x,y
+	circle num1
+	while num2 < 100
+		tri num2,num1
+		num2 = num2 + 25
+		x = x + 5
+	endwhile
+num2 = 25
+num1 = num1 + 25
+y = y + 5
+endwhile
+
+moveto 100,100
+num1 = 25
+while num1 < 200
+	circle num1
+	if num1 < 100
+		tri num1,num1
+	endif
+	num1 = num1 + 25
+endwhile
+
+num1 = 100
+num2 = 200
+moveto num1, num2
+rect num1,num2
+if num1 < num2
+	circle num1
+	tri num1,num1
+endif
+
+num1 = 10
+while num1 < 100
+  num1 = num1 + 10
+  circle num1
+endwhile

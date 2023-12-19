@@ -1,0 +1,102 @@
+//it doesn’t structure it in a particularly OO way, we would think about that later
+//version 2.2 now includes ifs, version 2.1(below) used in the video
+//explanation video
+programCounter = 0
+loopCounter = 0
+loopSize = 0
+loopFlag = false
+variableCounter = 0
+methodCounter = 0;
+methodFlag = false;
+methodExecuting = false;
+saveProgramCounter = 0;
+executeLinesFlag = true; //used for ifs
+
+while commands in program
+	line = program[programCounter++]
+	split line
+		get command
+		get parameters
+		if invalid report syntax error and continue
+		
+	//if we are inside a method declaration don't execute anything (I haven't done method parameters, I have to leave something)
+	if methodFlag == true //don't execute lines as we are in a method definition
+		continue;
+	if executeLinesFlag == false //are we going through the body of a loop when the condition is false
+		continue;
+		
+	//declare methods (methods must be declared first before use)
+	if method keyword
+		methodNames[methodCounter] = parameter //method name
+		methodLocation[methodCounter++] = programCounter //store where it is
+		methodFlag = true
+		
+	if end defining methmethod keyword and methodExecuting == false //endmethod keyword when od
+		methodFlag = false
+	if endmethod keyword and methodExecuting == true //endmethod keyword when calling a method
+		methodExecuting = false
+		programCounter = saveProgramCounter
+		continue;
+		
+	//call a method
+	if call keyword //calling a method
+		found = checkMethod(parameter)
+		if found >= 0
+			saveProgramCounter = programCounter+1 //return address, note not a stack so no nested method calls
+			programCounter = methodLocation[found] //go to method
+			methodExecuting = true
+			continue;
+		else
+			report syntax_error no such method
+	//declare variables
+	if var command //declare variable i.e. var radius
+		found = checkVariable(parameter) //make sure variable hasn't already been declared
+		if found >= 0
+			report syntax_error variable already declared
+		else
+		   variableNames[variableCounter] = parameter //name of variable
+		   variableValues[variableCounter++] = 0 //initialise variable to zero
+    
+	//set variables
+	if parameter == "=" //if command is of the form something = number it is a variable setting
+		found = checkVariable(command) //first thing was the variable name, is it declared?
+		if found >= 0
+			variableNames[found] = command
+			variableValues[found] = parameter 
+		else
+			report syntax error variable not declared
+	//loop
+	if command == loop
+		iterations = parameter //how many times are we going around?
+		loopFlag = true //signify we are processing a loop
+		loopCounter = 0 //first go round
+		loopSize = 0 //begin counting how many lines are in the body
+		
+	if command == endloop
+		loopFlag = false //stop counting the size of the body of he loop
+		if loopCounter++ < iterations
+			programCounter = programCounter - loopSize //perform jump to start of loop (first line in body)
+
+
+	if standard graphic commands etc
+		blah blah but will have to parse any variables used
+	
+	
+	if loopFlag == true
+		loopSize++ //count the size of the body of a loop if we are in a loop
+	
+	if command == if //if condition is true just go on as normal executing commands but if it is false it needs to ignore commands in the body of the if
+		if condition == false
+			executeLinesFlag = false 
+			
+	if command == endif 
+		executeLinesFlag == true //this won't work for nested ifs (I'm not expecting those)
+		
+endwhile
+
+
+method int checkVariables(name)
+	for loop = 0 to variableCounter
+	    if variableNames[loop] == name return loop
+	return -1
+end method
