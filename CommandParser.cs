@@ -94,13 +94,19 @@ namespace WindowsFormsApp1
             string[] commandParts = command.Split(' ');
             string action = commandParts[0].ToLower();
 
+            for (int i = 1; i < commandParts.Length; i++)
+            {
+                int resolvedValue = ResolveArgumentToInteger(commandParts[i]);
+                commandParts[i] = resolvedValue.ToString();  // Convert the int back to a string
+            }
+
             switch (action)
             {
                 case "moveto":
                     MoveToCommand(commandParts);
                     break;
 
-                case "drawto":
+                case "drawto": 
                     DrawToCommand(commandParts);
                     break;
 
@@ -131,6 +137,29 @@ namespace WindowsFormsApp1
                 
             }
 
+        }
+        /// <summary>
+        /// Resolves a command argument to an integer value
+        /// </summary>
+        /// <param name="arg">The command argument, which can be a variable name or a direct integer</param>
+        /// <remarks>
+        /// The method checks if the provided argument is a defined variable in the variable manager class, if so it retrieves the variables value.
+        /// if the argument is not a variable, it attemps to parse the argument as a direct integer. If neither condition is met, an exception is thrown. 
+        /// </remarks>
+        private int ResolveArgumentToInteger(string arg)
+        {
+            if (variableManager.IsVariableDefined(arg))
+            {
+                return variableManager.GetVariable(arg);
+            }
+            else if (int.TryParse(arg, out int value))
+            {
+                return value; 
+            }
+            else
+            {
+                throw new ArgumentException($"Invalid argument {arg} for command");
+            }
         }
 
         /// <summary>
@@ -291,19 +320,22 @@ namespace WindowsFormsApp1
         /// </remarks>
         private void DrawToCommand(string[] commandParts)
         {
-            if (commandParts.Length == 3 && int.TryParse(commandParts[1], out int x) && int.TryParse(commandParts[2], out int y))
+            if (commandParts.Length < 3)
             {
-                Point newPenPosition = new Point(x, y);
-                drawingManager.DrawLine(penPosition, newPenPosition);
-                penPosition = newPenPosition;
+                throw new ArgumentException("Insufficient arguments for 'drawto' command.");
+            }
 
-                outputTextBox.AppendText($"Line drawn to ({x}, {y})\n"); 
-            }
-            else
-            {
-                throw new ArgumentException("Invlaid 'drawto' command. Expected Format: 'drawto x y'");
-            }
+            int x = ResolveArgumentToInteger(commandParts[1]);
+            int y = ResolveArgumentToInteger(commandParts[2]);
+
+            
+            Point newPenPosition = new Point(x, y);
+            drawingManager.DrawLine(penPosition, newPenPosition);
+            penPosition = newPenPosition; 
+
+            outputTextBox.AppendText($"Line drawn to ({x}, {y}).\n");
         }
+
 
         /// <summary>
         /// Resets the pen position to the top left corner of the drawing surface.
