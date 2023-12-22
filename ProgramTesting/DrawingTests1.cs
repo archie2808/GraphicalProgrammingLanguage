@@ -12,6 +12,7 @@ namespace ProgramTesting
     {
         private TextBox outputTextBox;
         private Bitmap drawingSurface;
+        private VariableManager vm;
         private CommandParser commandParser;
 
 
@@ -21,7 +22,7 @@ namespace ProgramTesting
             // Arrange
             outputTextBox = new TextBox();
             drawingSurface = new Bitmap(500, 500);
-            commandParser = new CommandParser(outputTextBox, drawingSurface);
+            commandParser = new CommandParser(outputTextBox, drawingSurface, vm);
 
         }
         /// <summary>

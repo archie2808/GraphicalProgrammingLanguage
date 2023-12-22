@@ -56,7 +56,7 @@ namespace WindowsFormsApp1
         /// The constructor sets up the initial state of the Parser, including setting the initial pen position
         /// and associating the output TextBox and drawing Bitmap
         /// </remarks>
-        public CommandParser(TextBox output, Bitmap surface)
+        public CommandParser(TextBox output, Bitmap surface, VariableManager vm)
         {
             penPosition = new Point(0, 0);
             outputTextBox = output;

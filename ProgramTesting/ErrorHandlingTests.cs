@@ -17,6 +17,7 @@ namespace ProgramTesting
        
         private TextBox outputTextBox;
         private Bitmap drawingSurface;
+        private VariableManager vm;
         private CommandParser commandParser;
 
         [TestInitialize]
@@ -24,7 +25,7 @@ namespace ProgramTesting
         {
             outputTextBox = new TextBox();
             drawingSurface = new Bitmap(500, 500);
-            commandParser = new CommandParser(outputTextBox, drawingSurface);
+            commandParser = new CommandParser(outputTextBox, drawingSurface, vm);
         }
         /// <summary>
         /// Tests whether the 'ExecuteCommand' method throws an InvalidOperationException
@@ -58,7 +59,7 @@ namespace ProgramTesting
         {
             // Arrange
             string command = "moveto 100"; 
-            var commandParser = new CommandParser(outputTextBox, drawingSurface);
+            var commandParser = new CommandParser(outputTextBox, drawingSurface, vm);
 
             // Act
             commandParser.ExecuteCommand(command);
@@ -77,7 +78,7 @@ namespace ProgramTesting
         {
             // Arrange
             string command = "circle 100 100 200"; 
-            var commandParser = new CommandParser(outputTextBox, drawingSurface);
+            var commandParser = new CommandParser(outputTextBox, drawingSurface, vm);
 
             // Act
             commandParser.ExecuteCommand(command);

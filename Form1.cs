@@ -17,7 +17,7 @@ namespace WindowsFormsApp1
     public partial class Form1 : Form
     {
         private CommandParser commandParser;
-       
+        private VariableManager vm;
         private Bitmap drawingSurface;
         private string defaultDirectory;
 
@@ -33,7 +33,7 @@ namespace WindowsFormsApp1
             InitializeComponent();
             drawingSurface = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             pictureBox1.Image = drawingSurface;
-            commandParser = new CommandParser(textBox2, drawingSurface);
+            commandParser = new CommandParser(textBox2, drawingSurface, vm);
             defaultDirectory = @"C:\Users\archi\OneDrive - Leeds Beckett University\YEAR 3\ASE\SCRIPTS"; 
         }
 

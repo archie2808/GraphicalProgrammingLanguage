@@ -14,7 +14,9 @@ namespace ProgramTesting
         private Form1 form;
         private TextBox outputTextBox;
         private Bitmap drawingSurface;
+        private VariableManager vm;
         private CommandParser commandParser;
+        
 
 
 
@@ -24,7 +26,7 @@ namespace ProgramTesting
             form = new Form1();
             outputTextBox = new TextBox();
             drawingSurface = new Bitmap(500, 500);
-            commandParser = new CommandParser(outputTextBox, drawingSurface);
+            commandParser = new CommandParser(outputTextBox, drawingSurface, vm);
             form.SetDrawingSurfaceForTest(drawingSurface);
         }
 
