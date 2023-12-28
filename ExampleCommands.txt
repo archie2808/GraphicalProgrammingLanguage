@@ -53,7 +53,7 @@ endwhile
 num1 = 100
 num2 = 200
 moveto num1, num2
-rect num1,num2
+rectangle num1,num2
 if num1 < num2
 	circle num1
 	tri num1,num1

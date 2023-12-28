@@ -19,6 +19,7 @@ namespace WindowsFormsApp1
         private TextBox outputTextBox;
         private DrawingManager drawingManager;
         private VariableManager variableManager;
+        private IfStatementManager ifStatementManager;
 
         /// <summary>
         /// Gets the current position of the pen at the drawing surface
@@ -65,6 +66,40 @@ namespace WindowsFormsApp1
             variableManager = new VariableManager();
         }
 
+        private bool isInsideIfStatement = false; //Flag to indicate if we are currently processing commands inside of an if block
+
+        public void IfStatementExecution(string command)
+        {
+            //Check if the command is the start of an if statement
+            if (command.StartsWith("if"))
+            {
+                //Set the flag to true upon entering if statement
+                isInsideIfStatement = true;
+                //Delegation of logic to IfStatementManager
+                ifStatementManager.StartIfStatement(command);
+            }
+
+            //check if the command signifies the end of the if statement
+            else if (command == "endif")
+            {
+                //set flag to false
+                isInsideIfStatement = false;
+                //delegation of logic to IfStatementManager
+                ifStatementManager.EndIfStatement(this);
+            }
+
+            //check if we are inside if statement block
+            else if (isInsideIfStatement)
+            {
+                //Add the command to the current if statement block in IfStatementManager
+                ifStatementManager.AddCommand(command);
+            }
+
+            else
+            {
+                ExecuteCommand(command);
+            }
+        }
         /// <summary>
         /// Executes user commands based on provided inputs
         /// </summary>      
