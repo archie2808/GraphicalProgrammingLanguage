@@ -229,19 +229,20 @@ namespace WindowsFormsApp1
         /// </remarks>
         private void TriangleCommand(string[] commandParts)
         {
-            if (commandParts.Length == 3 && int.TryParse(commandParts[1], out int x) && int.TryParse(commandParts[2], out int y))
-            {
-                Point startVertex = new Point(x, y);
-                int sideLength = 100;
-
-                drawingManager.DrawTriangle(startVertex, sideLength);
-                outputTextBox.AppendText($"Triangle drawn with starting vertex at ({x} , {y}).\n");
-            }
-
-            else
+            if (commandParts.Length < 3)
             {
                 throw new ArgumentException("Invalid 'triangle' command. Expected Format: triangle x y");
             }
+
+            int x = ResolveArgumentToInteger(commandParts[1]);
+            int y = ResolveArgumentToInteger(commandParts[2]);
+            int sideLength = ResolveArgumentToInteger(commandParts[3]);
+
+            Point startVertex = new Point(x, y);
+           
+
+            drawingManager.DrawTriangle(startVertex, sideLength);
+            outputTextBox.AppendText($"Triangle drawn with starting vertex at ({x}, {y}).\n");
         }
 
         /// <summary>
@@ -254,16 +255,17 @@ namespace WindowsFormsApp1
         /// </remarks>
         private void CircleCommand(string[] commandParts)
         {
-            if (commandParts.Length == 2 && int.TryParse(commandParts[1], out int radius))
+            if (commandParts.Length < 2)
             {
-                drawingManager.DrawCircle(penPosition, radius);
-                outputTextBox.AppendText($"Circle drawn with radius {radius}.\n");
+                throw new ArgumentException("Insufficient arguments for 'circle' command.");
             }
-            else
-            {
-                throw new ArgumentException("Invalid 'circle' command. Expected Format: 'circle radius'");
-            }
+
+            int radius = ResolveArgumentToInteger(commandParts[1]);
+
+            drawingManager.DrawCircle(penPosition, radius);
+            outputTextBox.AppendText($"Circle drawn with radius {radius}.\n");
         }
+        
 
         /// <summary>
         /// Processes the rectangle command to draw a rectangle onto drawing surface
@@ -275,16 +277,17 @@ namespace WindowsFormsApp1
         /// left corner at the current pen position
         /// </remarks>
         private void RectangleCommand(string[] commandParts)
-        { 
-            if (commandParts.Length == 3 && int.TryParse(commandParts[1], out int width) && int.TryParse(commandParts[2], out int height))
+        {
+            if (commandParts.Length < 3)
             {
-                drawingManager.DrawRectangle(PenPosition, width, height);
-                outputTextBox.AppendText($"Rectangle drawn at ({penPosition.X}, {penPosition.Y}) with width {width} and height {height}");
+                throw new ArgumentException("Insufficient arguments for 'rectangle' command.");
             }
-            else
-            {
-                throw new ArgumentException("invalid 'rectangle' command. Expected format: recatangle width height");
-            }
+
+            int width = ResolveArgumentToInteger(commandParts[1]);
+            int height = ResolveArgumentToInteger(commandParts[2]);
+
+            drawingManager.DrawRectangle(penPosition, width, height);
+            outputTextBox.AppendText($"Rectangle drawn at ({penPosition.X}, {penPosition.Y}) with width {width} and height {height}\n");
         }
        
         /// <summary>
@@ -297,16 +300,16 @@ namespace WindowsFormsApp1
         /// </remarks>
         private void MoveToCommand(string[] commandParts)
         {
-            if (commandParts.Length == 3 && int.TryParse(commandParts[1], out int x) && int.TryParse(commandParts[2], out int y))
+            if (commandParts.Length < 3)
             {
-                this.penPosition = new Point(x, y);
+                throw new ArgumentException("Insufficient arguments for 'moveto' command.");
+            }
 
-                 outputTextBox.AppendText($"Pen moved to ({x}, {y}). \n");
-            }
-            else
-            {
-                throw new ArgumentException("Invalid 'moveto' command. Expected Format: 'moveto x y'");
-            }
+            int x = ResolveArgumentToInteger(commandParts[1]);
+            int y = ResolveArgumentToInteger(commandParts[2]);
+
+            penPosition = new Point(x, y);
+            outputTextBox.AppendText($"Pen moved to ({x}, {y}). \n");
         }
 
         /// <summary>
@@ -359,10 +362,10 @@ namespace WindowsFormsApp1
         }
 
       
-
     }
-
 }
+    
+
 
    
 
