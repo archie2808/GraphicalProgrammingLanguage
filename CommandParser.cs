@@ -14,12 +14,12 @@ namespace WindowsFormsApp1
    
     public class CommandParser
     {
-        private Point penPosition;
+       
         private Bitmap drawingSurface;
         private TextBox outputTextBox;
         private DrawingManager drawingManager;
         private VariableManager variableManager;
-        private IfStatementManager ifStatementManager;
+        private Point penPosition;
 
         /// <summary>
         /// Gets the current position of the pen at the drawing surface
@@ -47,7 +47,7 @@ namespace WindowsFormsApp1
         {
             drawingManager.UpdateDrawingSurface(newSurface);
         }
-     
+
         /// <summary>
         /// Initializes a new instance of the <c>CommandParser</c> class.
         /// </summary>
@@ -63,13 +63,12 @@ namespace WindowsFormsApp1
             outputTextBox = output;
             drawingSurface = surface;
             drawingManager = new DrawingManager(surface);
-            variableManager = new VariableManager();
-            ifStatementManager = new IfStatementManager();
+            variableManager = vm;
         }
 
-        private bool isInsideIfStatement = false; //Flag to indicate if we are currently processing commands inside of an if block
+        //private bool isInsideIfStatement = false; //Flag to indicate if we are currently processing commands inside of an if block
 
-        public void IfStatementExecution(string command)
+        /*public void IfStatementExecution(string command)
         {
             //Check if the command is the start of an if statement
             if (command.StartsWith("if"))
@@ -100,7 +99,7 @@ namespace WindowsFormsApp1
             {
                 ExecuteCommand(command);
             }
-        }
+        }*/
         /// <summary>
         /// Executes user commands based on provided inputs
         /// </summary>      
@@ -109,94 +108,43 @@ namespace WindowsFormsApp1
         /// This method processes the command string, identifies the type of command. (e.g. moveto), 
         /// and executes the corresponding action. It also handles invalid commands.
         /// </remarks>
-        public void ExecuteCommand(string command)
+        public void ExecuteCommand(string commandString)
         { 
 
-            command = command.Trim();
-            if (string.IsNullOrEmpty(command))
+            commandString = commandString.Trim();
+            if (string.IsNullOrEmpty(commandString))
             {
                 throw new InvalidOperationException("no command to execute");
                 
             }
 
-            
-            if (command.Contains("="))
+            if (commandString == "reset")
             {
-                variableManager.ProcessVariableAssignment(command);
+                ResetCommand();
+                return; 
+            }
+            
+            if (commandString.Contains("="))
+            {
+                variableManager.ProcessVariableAssignment(commandString);
                 return;
             }
 
 
-            string[] commandParts = command.Split(' ');
+            string[] commandParts = commandString.Split(' ');
             string action = commandParts[0].ToLower();
 
             for (int i = 1; i < commandParts.Length; i++)
             {
-                int resolvedValue = ResolveArgumentToInteger(commandParts[i]);
+                int resolvedValue = CommandFactory.ResolveArgumentToInteger(commandParts[i], variableManager);
                 commandParts[i] = resolvedValue.ToString();  // Convert the int back to a string
             }
 
-            switch (action)
-            {
-                case "moveto":
-                    MoveToCommand(commandParts);
-                    break;
-
-                case "drawto": 
-                    DrawToCommand(commandParts);
-                    break;
-
-                case "rectangle":
-                    RectangleCommand(commandParts);
-                    break;
-
-                case "circle":
-                    CircleCommand(commandParts);
-                    break;
-
-                case "triangle":
-                    TriangleCommand(commandParts);
-                    break;
-
-                case "colour":
-                    ColourCommand(commandParts);
-                    break;
-
-                case "reset":
-                    ResetCommand();
-                    break;
-
-               
-
-                default:
-                    throw new InvalidOperationException($"unknown command: {action}");
-                
-            }
+            ICommand command = CommandFactory.CreateCommand( action, commandParts, drawingManager, variableManager, penPosition);
+            command.Execute();
 
         }
-        /// <summary>
-        /// Resolves a command argument to an integer value
-        /// </summary>
-        /// <param name="arg">The command argument, which can be a variable name or a direct integer</param>
-        /// <remarks>
-        /// The method checks if the provided argument is a defined variable in the variable manager class, if so it retrieves the variables value.
-        /// if the argument is not a variable, it attemps to parse the argument as a direct integer. If neither condition is met, an exception is thrown. 
-        /// </remarks>
-        public int ResolveArgumentToInteger(string arg)
-        {
-            if (variableManager.IsVariableDefined(arg))
-            {
-                return variableManager.GetVariable(arg);
-            }
-            else if (int.TryParse(arg, out int value))
-            {
-                return value; 
-            }
-            else
-            {
-                throw new ArgumentException($"Invalid argument {arg} for command");
-            }
-        }
+  
 
         /// <summary>
         /// Executes a series of commands provided in a script format
@@ -232,148 +180,16 @@ namespace WindowsFormsApp1
             }
         }
 
-        /// <summary>
-        /// Processes the 'colour' command to change the pens drawing colour
-        /// </summary>
-        /// <param name="commandParts"></param>
-        /// <remarks>
-        /// This method interprets the 'colour' command, extracts the colour name, and changes the pen colour in the drawing manager.
-        /// If the command is invalid (e.g., incorrect number of arguments or unrecognized colour name), an error message is displayed.
-        /// </remarks>
-        private void ColourCommand(string[] commandParts)
-        {
-            if (commandParts.Length == 2)
-            {
-                string colourName = commandParts[1];
-                drawingManager.ChangePenColor(colourName);
-                outputTextBox.AppendText($"Pen colour changed to {colourName}\n");
-            }
 
-            else
-            {
-                throw new ArgumentException("Invalid colour command, expected format: 'colour [colourname]");
-            }
-        }
 
-        /// <summary>
-        /// Process the triangle command to draw a triangle on the drawing surface.
-        /// </summary>
-        /// <param name="commandParts"></param>
-        /// <remarks>
-        /// This methods interprets the 'triangle' command, extracts the base co-ordinates and length, and 
-        /// instructs the drawing manager to draw a triangle. Throws excpetion if triangle command is not inputted correctly.
-        /// </remarks>
-        private void TriangleCommand(string[] commandParts)
-        {
-            if (commandParts.Length < 3)
-            {
-                throw new ArgumentException("Invalid 'triangle' command. Expected Format: triangle x y");
-            }
 
-            int x = ResolveArgumentToInteger(commandParts[1]);
-            int y = ResolveArgumentToInteger(commandParts[2]);
-            int sideLength = ResolveArgumentToInteger(commandParts[3]);
 
-            Point startVertex = new Point(x, y);
-           
-
-            drawingManager.DrawTriangle(startVertex, sideLength);
-            outputTextBox.AppendText($"Triangle drawn with starting vertex at ({x}, {y}).\n");
-        }
-
-        /// <summary>
-        /// Processes the circle command to draw a circle on the drawing surface.
-        /// </summary>
-        /// <param name="commandParts"></param>
-        /// <remarks>
-        /// The method interprets the circle command, extracts the radius and calls the DrawCircle method 
-        /// to draw the circle on the drawing surface.
-        /// </remarks>
-        private void CircleCommand(string[] commandParts)
-        {
-            if (commandParts.Length < 2)
-            {
-                throw new ArgumentException("Insufficient arguments for 'circle' command.");
-            }
-
-            int radius = ResolveArgumentToInteger(commandParts[1]);
-
-            drawingManager.DrawCircle(penPosition, radius);
-            outputTextBox.AppendText($"Circle drawn with radius {radius}.\n");
-        }
+        
+       
+   
         
 
-        /// <summary>
-        /// Processes the rectangle command to draw a rectangle onto drawing surface
-        /// </summary>
-        /// <param name="commandParts"></param>
-        /// <remarks>
-        /// The method interprets the rectangle command, extracts the width and height parameters, 
-        /// and then calls the drawing manager to a rectangle. The rectangle is drawn with its top 
-        /// left corner at the current pen position
-        /// </remarks>
-        private void RectangleCommand(string[] commandParts)
-        {
-            if (commandParts.Length < 3)
-            {
-                throw new ArgumentException("Insufficient arguments for 'rectangle' command.");
-            }
-
-            int width = ResolveArgumentToInteger(commandParts[1]);
-            int height = ResolveArgumentToInteger(commandParts[2]);
-
-            drawingManager.DrawRectangle(penPosition, width, height);
-            outputTextBox.AppendText($"Rectangle drawn at ({penPosition.X}, {penPosition.Y}) with width {width} and height {height}\n");
-        }
-       
-        /// <summary>
-        /// Processes the 'moveto' command, updating the pen position and drawing on the Bitmap
-        /// </summary>
-        /// <param name="commandParts">The parameters of the commanf, such as the co-oridinates</param>
-        /// <remarks>
-        /// This method updates the pen position based on the coordinates provided in the command.
-        /// 
-        /// </remarks>
-        private void MoveToCommand(string[] commandParts)
-        {
-            if (commandParts.Length < 3)
-            {
-                throw new ArgumentException("Insufficient arguments for 'moveto' command.");
-            }
-
-            int x = ResolveArgumentToInteger(commandParts[1]);
-            int y = ResolveArgumentToInteger(commandParts[2]);
-
-            penPosition = new Point(x, y);
-            outputTextBox.AppendText($"Pen moved to ({x}, {y}). \n");
-        }
-
-        /// <summary>
-        /// This method processes the draw to command, drawing a line from the current pen position to the specified co-ordinates
-        /// </summary>
-        /// <param name="commandParts">The parts of the command, including the drawto keyword and the x and y co-ordinates</param>
-        /// <remarks>
-        /// This  method interprets the 'drawto' command, extracts the destination coordinates, and draws a line from the current pen position to these coordinates.
-        /// It updates the pen position to the new location after drawing the line.
-        /// If the command is invalid (e.g., incorrect number of arguments or non-numeric coordinates), an error message is displayed.
-        /// </remarks>
-        private void DrawToCommand(string[] commandParts)
-        {
-            if (commandParts.Length < 3)
-            {
-                throw new ArgumentException("Insufficient arguments for 'drawto' command.");
-            }
-
-            int x = ResolveArgumentToInteger(commandParts[1]);
-            int y = ResolveArgumentToInteger(commandParts[2]);
-
-            
-            Point newPenPosition = new Point(x, y);
-            drawingManager.DrawLine(penPosition, newPenPosition);
-            penPosition = newPenPosition; 
-
-            outputTextBox.AppendText($"Line drawn to ({x}, {y}).\n");
-        }
+      
 
 
         /// <summary>

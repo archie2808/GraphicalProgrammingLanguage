@@ -11,17 +11,17 @@ namespace WindowsFormsApp1
     {
         
         private  Point newPosition;
-        private Action<Point> updatePenPositionAction;
+        public Point NewPenPosition { get; private set; }
 
-        public MoveToCommand(Action<Point> updatePenPositionAction, Point newPosition)
+        public MoveToCommand( Point newPosition)
         {
-            this.updatePenPositionAction = updatePenPositionAction;
+          
             this.newPosition = newPosition;
         }
 
         public void Execute()
         {
-            updatePenPositionAction(newPosition);
+            NewPenPosition = newPosition;
         }
     }
 }

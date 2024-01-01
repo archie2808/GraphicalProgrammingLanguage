@@ -88,6 +88,6 @@ namespace WindowsFormsApp1
         /// if the argument is not a variable, it attemps to parse the argument as a direct integer. If neither condition is met, an exception is thrown. 
         /// </remarks>
         
-        }
+        
     }
 }

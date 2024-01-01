@@ -33,8 +33,10 @@ namespace WindowsFormsApp1
             InitializeComponent();
             drawingSurface = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             pictureBox1.Image = drawingSurface;
+            vm = new VariableManager();
             commandParser = new CommandParser(textBox2, drawingSurface, vm);
-            defaultDirectory = @"C:\Users\archi\OneDrive - Leeds Beckett University\YEAR 3\ASE\SCRIPTS"; 
+            defaultDirectory = @"C:\Users\archi\OneDrive - Leeds Beckett University\YEAR 3\ASE\SCRIPTS";
+            
         }
 
 
