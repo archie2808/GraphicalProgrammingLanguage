@@ -64,6 +64,7 @@ namespace WindowsFormsApp1
             drawingSurface = surface;
             drawingManager = new DrawingManager(surface);
             variableManager = new VariableManager();
+            ifStatementManager = new IfStatementManager();
         }
 
         private bool isInsideIfStatement = false; //Flag to indicate if we are currently processing commands inside of an if block
@@ -181,7 +182,7 @@ namespace WindowsFormsApp1
         /// The method checks if the provided argument is a defined variable in the variable manager class, if so it retrieves the variables value.
         /// if the argument is not a variable, it attemps to parse the argument as a direct integer. If neither condition is met, an exception is thrown. 
         /// </remarks>
-        private int ResolveArgumentToInteger(string arg)
+        public int ResolveArgumentToInteger(string arg)
         {
             if (variableManager.IsVariableDefined(arg))
             {
