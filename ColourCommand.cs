@@ -7,7 +7,9 @@ using System.Drawing;
 
 namespace WindowsFormsApp1
 {
-
+    /// <summary>
+    /// Sets the necassary state and initialises required dependancies
+    /// </summary>
     public class ColourCommand : ICommand
     {
         private readonly DrawingManager drawingManager;

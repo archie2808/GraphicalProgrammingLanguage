@@ -133,14 +133,17 @@ namespace WindowsFormsApp1
 
             string[] commandParts = commandString.Split(' ');
             string action = commandParts[0].ToLower();
+            string[] arguments = commandParts.Skip(1).ToArray();
 
-            for (int i = 1; i < commandParts.Length; i++)
+            if (action != "colour")
             {
-                int resolvedValue = CommandFactory.ResolveArgumentToInteger(commandParts[i], variableManager);
-                commandParts[i] = resolvedValue.ToString();  // Convert the int back to a string
+                for (int i = 1; i < commandParts.Length; i++)
+                {
+                    int resolvedValue = CommandFactory.ResolveArgumentToInteger(commandParts[i], variableManager);
+                    commandParts[i] = resolvedValue.ToString();  // Convert the int back to a string
+                }
             }
-
-            ICommand command = CommandFactory.CreateCommand( action, commandParts, drawingManager, variableManager, penPosition);
+            ICommand command = CommandFactory.CreateCommand( action, arguments, drawingManager, variableManager, penPosition);
             command.Execute();
 
         }

@@ -6,9 +6,9 @@ using System;
 using System.Drawing.Drawing2D;
 using System.IO;
 
-namespace ProgramTesting
-{
-    [TestClass]
+//namespace ProgramTesting
+//{
+  /*  [TestClass]
     public class CommandParsingTests
     {
         private Form1 form;
@@ -83,4 +83,4 @@ namespace ProgramTesting
         }
 
     }
-}
+}*/

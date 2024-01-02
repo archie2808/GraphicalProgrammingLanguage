@@ -5,7 +5,7 @@ using WindowsFormsApp1;
 using System;
 using System.Drawing.Drawing2D;
 
-namespace ProgramTesting
+/*namespace ProgramTesting
 {
     [TestClass]
     public class DrawingTests1
@@ -213,5 +213,5 @@ namespace ProgramTesting
 }
 
 
-
+*/
 

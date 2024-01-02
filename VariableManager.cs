@@ -79,14 +79,7 @@ namespace WindowsFormsApp1
             return variables.ContainsKey(name);
         }
 
-        /// <summary>
-        /// Resolves a command argument to an integer value
-        /// </summary>
-        /// <param name="arg">The command argument, which can be a variable name or a direct integer</param>
-        /// <remarks>
-        /// The method checks if the provided argument is a defined variable in the variable manager class, if so it retrieves the variables value.
-        /// if the argument is not a variable, it attemps to parse the argument as a direct integer. If neither condition is met, an exception is thrown. 
-        /// </remarks>
+        
         
         
     }

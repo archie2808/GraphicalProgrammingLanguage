@@ -7,9 +7,28 @@ using System.Drawing;
 
 namespace WindowsFormsApp1
 {
+    /// <summary>
+    /// Responsible for creating and initialising instances of command classes.
+    /// </summary>
+    /// <remarks>
+    /// This factory class abstacts the instantiation logic of the command objects, 
+    /// therby decoupling command creation from the client code.
+    /// </remarks>
     public static class CommandFactory
     {
-        
+        /// <summary>
+        /// Creates a command object based on the provided command string and additional parameters
+        /// </summary>
+        /// <param name="commandString">The command String indicating the type of command to create</param>
+        /// <param name="arguments">The arguments required for the commands execution</param>
+        /// <param name="drawingManager">The drawing manager to be used bu the command for drawing</param>
+        /// <param name="variableManager">The variable manager for managing command variables</param>
+        /// <param name="penPosition">current position of the pen.</param>
+        /// <returns>
+        /// An instance of a class that implements the icommand interface, corresponding to a specified command.
+        /// </returns>
+        /// <exception cref="InvalidOperationException">Thrown when an unknown command type is encountered.</exception>
+        /// <exception cref="ArgumentException">Thrown when the provided arguments are insufficient or invalid for the specified command.</exception>
         public static ICommand CreateCommand(string commandString,string[] arguments, DrawingManager drawingManager,
             VariableManager variableManager, Point penPosition)
         {

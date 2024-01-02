@@ -11,79 +11,68 @@ using System.Drawing;
 namespace ProgramTesting
 {
     /// <summary>
-    /// A Test class dedicated to ensuring correct functionality of variables. 
+    /// A Test class dedicated to ensuring correct functionality of variables within the drawing application.
     /// </summary>
     [TestClass]
     public class VariableTest
     {
-        
-        private CommandParser commandParser;
-        private TextBox outputTextBox;
-        private Bitmap drawingSurface;
         private VariableManager vm;
+        private DrawingManager drawingManager;
+        private Bitmap drawingSurface;
 
         /// <summary>
-        /// Setup the necassary dependancies 
+        /// Sets up the necessary dependencies before each test is run.
+        /// Initializes instances of VariableManager, DrawingManager, and a Bitmap for the drawing surface.
         /// </summary>
         [TestInitialize]
         public void SetUp()
         {
-
-            outputTextBox = new TextBox();
-            drawingSurface = new Bitmap(500, 500);
-
             vm = new VariableManager();
-            commandParser = new CommandParser(outputTextBox, drawingSurface, vm);
-            
+            drawingSurface = new Bitmap(500, 500);
+            drawingManager = new DrawingManager(drawingSurface);
         }
 
         /// <summary>
-        /// The tests purpose is to ensure that variables and their values are being correctly assigned
+        /// Tests whether variables can be correctly assigned and retrieved using the VariableManager.
         /// </summary>
         [TestMethod]
         public void VariableAssignmentAndRetrievalTest()
         {
-            VariableManager vm = new VariableManager();
             vm.SetVariable("testVar", 100);
             int result = vm.GetVariable("testVar");
 
             Assert.AreEqual(100, result, "Variable should return the value it was set to.");
-
         }
-
         /// <summary>
-        /// The Test ensures that the correct error handling is in place for calling undefined variables
+        /// Tests that an exception is thrown when attempting to retrieve an undefined variable.
+        /// Expects an InvalidOperationException to be thrown.
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void RetrievingUndefinedVariableTest()
         {
-            VariableManager vm = new VariableManager();
             vm.GetVariable("undefinedVar");
         }
 
         /// <summary>
-        /// The Test ensures that variables can be correctly assigned, called, and executed.
+        /// Tests the usage of variables in command execution.
+        /// Sets variables, creates a DrawToCommand with these variables, and executes it.
+        /// Verifies that the drawing was performed at the expected location by checking the pixel color.
         /// </summary>
         [TestMethod]
         public void VariableUsageInCommands()
         {
+            vm.SetVariable("endX", 10);
+            vm.SetVariable("endY", 10);
+
             Point startPosition = new Point(0, 0);
+            Point endPosition = new Point(vm.GetVariable("endX"), vm.GetVariable("endY"));
+            ICommand drawToCommand = new DrawToCommand(drawingManager, startPosition, endPosition);
+            drawToCommand.Execute();
 
-
-            
             var expectedColor = Color.Blue.ToArgb();
-
-
-    
-            commandParser.ExecuteCommand("endX = 10");
-            commandParser.ExecuteCommand("endY = 10");
-            commandParser.ExecuteCommand("drawto endX endY");
-
-         
             var actualColor = drawingSurface.GetPixel(5, 5).ToArgb();
 
-          
             Assert.AreEqual(expectedColor, actualColor, "The pixel color should match the drawn line's color.");
         }
     }

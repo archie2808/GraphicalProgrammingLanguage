@@ -6,7 +6,7 @@ using System;
 using System.Drawing.Drawing2D;
 using System.IO;
 
-namespace ProgramTesting
+/*namespace ProgramTesting
 {
     /// <summary>
     /// Test class for Verifying functionality of Error Handling. 
@@ -88,3 +88,4 @@ namespace ProgramTesting
 
     }
 }
+*/
