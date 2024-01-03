@@ -17,9 +17,10 @@ namespace WindowsFormsApp1
     public partial class Form1 : Form
     {
         private CommandParser commandParser;
-        private VariableManager vm;
+        private VariableManager variableManager;
         private Bitmap drawingSurface;
         private string defaultDirectory;
+        private IfStatementManager ifStatementManager;
 
         /// <summary>
         /// Initialized a new instance of the <c>Form1</c> class
@@ -33,8 +34,11 @@ namespace WindowsFormsApp1
             InitializeComponent();
             drawingSurface = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             pictureBox1.Image = drawingSurface;
-            vm = new VariableManager();
-            commandParser = new CommandParser(textBox2, drawingSurface, vm);
+            variableManager = new VariableManager();
+            ifStatementManager = new IfStatementManager(variableManager);
+            
+            commandParser = new CommandParser(textBox2, drawingSurface, variableManager, ifStatementManager);
+            ifStatementManager.SetCommandParser(commandParser);
             defaultDirectory = @"C:\Users\archi\OneDrive - Leeds Beckett University\YEAR 3\ASE\SCRIPTS";
             
         }
@@ -73,18 +77,7 @@ namespace WindowsFormsApp1
 
         }
 
-        /// <summary>
-        /// Sets the script text for testing purposes.
-        /// </summary>
-        /// <param name="script">The script to be set in the text box.</param>
-        /// <remarks>
-        /// This method is intended for use in unit tests. It allows for programmatically setting the script text
-        /// in textBox2, which is used to simulate user input of a script in a testing environment.
-        /// </remarks>
-        public void SetScriptForTest(string script)
-        {
-            textBox2.Text = script;
-        }
+       
         private void Form1_Load(object sender, EventArgs e)
         {
 
@@ -180,38 +173,7 @@ namespace WindowsFormsApp1
 
         }
 
-        /// <summary>
-        /// Processes a given command string. If the command is 'run', it executes a script from textbox2
-        /// otherwise it executes the command using the commandParser
-        /// </summary>
-        /// <param name="command"></param>
-        /// <remarks>
-        /// This method abstracts the command processing logic away from the UI event, making it more testable
-        /// </remarks>
-        public void ProcessRunCommand(string command)
-        {
-            if (command == "run")
-            {
-
-                string script = textBox2.Text;
-
-
-                commandParser.ExecuteScript(script);
-            }
-            else
-            {
-
-                try
-                {
-                    commandParser.ExecuteCommand(command);
-                }
-                catch (Exception ex)
-                {
-                    errorLabel.Text = $"Error executing command '{command}': {ex.Message}";
-
-                }
-            }
-        }
+    
         /// <summary>
         /// Handles the key down event of textBox1
         /// </summary>
@@ -225,9 +187,9 @@ namespace WindowsFormsApp1
         {
             if (e.KeyCode == Keys.Enter)
             {
-                string command = textBox1.Text.Trim().ToLower();
-                    ProcessRunCommand(command);
-                
+                string script = textBox2.Text;
+                commandParser.ExecuteScript(script);
+
             }
         }
         private void label1_Click(object sender, EventArgs e)

@@ -11,13 +11,13 @@ namespace WindowsFormsApp1
     /// <summary>
     /// The <c>CommandParser</c> class is responsible for interpreting and executing user commands. 
     /// </summary>
-   
     public class CommandParser
     {
        
         private Bitmap drawingSurface;
         private TextBox outputTextBox;
         private DrawingManager drawingManager;
+        private IfStatementManager ifStatementManager;
         private VariableManager variableManager;
         private Point penPosition;
 
@@ -49,26 +49,35 @@ namespace WindowsFormsApp1
         }
 
         /// <summary>
-        /// Initializes a new instance of the <c>CommandParser</c> class.
+        /// Initializes a new instance of the <c>CommandParser</c> class, setting up essential components for command parsing and execution.
         /// </summary>
-        /// <param name="output">The textbox control 1where output messages are displayed</param>
-        /// <param name="surface">The bitmap surface on which drawing commands are executed</param>
-        /// <remarks>
-        /// The constructor sets up the initial state of the Parser, including setting the initial pen position
-        /// and associating the output TextBox and drawing Bitmap
-        /// </remarks>
-        public CommandParser(TextBox output, Bitmap surface, VariableManager vm)
+        /// <param name="output">The TextBox control where output messages are displayed.</param>
+        /// <param name="surface">The Bitmap surface on which drawing commands are executed.</param>
+        /// <param name="vm">The variable manager for managing script variables.</param>
+        /// <param name="ifStatementManager">The if statement manager for handling conditional commands.</param>
+        public CommandParser(TextBox output, Bitmap surface, VariableManager vm, IfStatementManager ifStatementManager)
         {
             penPosition = new Point(0, 0);
             outputTextBox = output;
             drawingSurface = surface;
             drawingManager = new DrawingManager(surface);
             variableManager = vm;
+            this.ifStatementManager = ifStatementManager;
         }
 
-        //private bool isInsideIfStatement = false; //Flag to indicate if we are currently processing commands inside of an if block
+        //Flag to indicate if we are currently processing commands inside of an if block
+        private bool isInsideIfStatement = false;
 
-        /*public void IfStatementExecution(string command)
+        /// <summary>
+        /// Executes conditional logic based on 'if' statement syntax. This method manages the evaluation of conditions and 
+        /// the execution of command blocks depending on the outcome of the condition.
+        /// </summary>
+        /// <param name="command">The command string that may contain an 'if' statement and its associated logic.</param>
+        /// <remarks>
+        /// This method processes 'if', 'endif', and other commands within the scope of an if statement. It delegates to 
+        /// IfStatementManager for handling the condition logic and the execution of commands within the if statement block.
+        /// </remarks>
+        public void IfStatementExecution(string command)
         {
             //Check if the command is the start of an if statement
             if (command.StartsWith("if"))
@@ -99,38 +108,59 @@ namespace WindowsFormsApp1
             {
                 ExecuteCommand(command);
             }
-        }*/
+        }
         /// <summary>
-        /// Executes user commands based on provided inputs
-        /// </summary>      
-        /// <param name="command">The command string to be parsed and executed</param>
+        /// Parses and executes a given command string. This method identifies the type of command (e.g., drawing command, variable assignment, 
+        /// control flow command) and executes it accordingly.
+        /// </summary>
+        /// <param name="commandString">The command string to be parsed and executed.</param>
         /// <remarks>
-        /// This method processes the command string, identifies the type of command. (e.g. moveto), 
-        /// and executes the corresponding action. It also handles invalid commands.
+        /// This method is the central hub for executing all types of commands. It includes logic to handle different command types 
+        /// and delegates to specific methods or classes for detailed execution.
         /// </remarks>
         public void ExecuteCommand(string commandString)
-        { 
+        {
 
             commandString = commandString.Trim();
             if (string.IsNullOrEmpty(commandString))
             {
                 throw new InvalidOperationException("no command to execute");
-                
+
             }
 
             if (commandString == "reset")
             {
                 ResetCommand();
-                return; 
+                return;
             }
-            
+
             if (commandString.Contains("="))
             {
                 variableManager.ProcessVariableAssignment(commandString);
                 return;
             }
 
+            
+            if (commandString.StartsWith("if") || commandString =="endif" || isInsideIfStatement)
+            {
+                IfStatementExecution(commandString);
+                return;
+            }
 
+            ExecuteSingleCommand(commandString);
+        }
+
+        /// <summary>
+        /// Executes a single, isolated command, typically a drawing command. This method is focused on parsing and executing commands 
+        /// that involve drawing operations.
+        /// </summary>
+        /// <param name="commandString">The command string representing a single drawing action.</param>
+        /// <remarks>
+        /// This method is primarily used for executing commands related to drawing, such as 'moveto', 'drawto', etc. It relies on the 
+        /// DrawingManager for the actual drawing operations.
+        /// </remarks>
+        public void ExecuteSingleCommand(string commandString)
+        { 
             string[] commandParts = commandString.Split(' ');
             string action = commandParts[0].ToLower();
             string[] arguments = commandParts.Skip(1).ToArray();
@@ -148,51 +178,15 @@ namespace WindowsFormsApp1
 
         }
   
-
-        /// <summary>
-        /// Executes a series of commands provided in a script format
-        /// </summary>
-        /// <param name="script">The script containing the commands to be executed</param>
-        /// <remarks>
-        /// The method processes each line of the script as an individual command.
-        /// It trims any whitespace from each command before execution. 
-        /// If a command causes an exception, a Messagebox is displayed with error details. 
-        /// </remarks>
         public void ExecuteScript(string script)
         {
-            string[] commands = script.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            string[] lines = script.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-            foreach (string command in commands)
+            foreach (var line in lines)
             {
-                try
-                {
-                    
-                    string trimmedCommand = command.Trim();
-
-                    
-                    if (!string.IsNullOrEmpty(trimmedCommand))
-                    {
-                        ExecuteCommand(trimmedCommand);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"error {ex}");
-                    break;
-                }
+                ExecuteCommand(line);
             }
         }
-
-
-
-
-
-        
-       
-   
-        
-
-      
 
 
         /// <summary>

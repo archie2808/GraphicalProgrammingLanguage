@@ -69,7 +69,6 @@ namespace WindowsFormsApp1
         /// <param name="commandParts">The parameters of the commanf, such as the co-oridinates</param>
         /// <remarks>
         /// This method updates the pen position based on the coordinates provided in the command.
-        /// 
         /// </remarks>
         private static ICommand CreateMoveToCommand(string[] args, VariableManager variableManager)
         {

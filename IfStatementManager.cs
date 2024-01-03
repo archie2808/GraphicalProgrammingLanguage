@@ -3,40 +3,67 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-/*
+
 namespace WindowsFormsApp1
 {
+    /// <summary>
+    /// Manages the execution of conditional IF statements
+    /// </summary>
     public class IfStatementManager
     {
         private CommandParser commandParser;
-        private bool conditionResult; //Flag to store the result of the if statements condition
+        private VariableManager variableManager; 
+        private bool conditionResult; 
 
-        //list to store the commands inside the if statements bloc
+        //list to store the commands inside the if statements block 
         private List<String> commandBlock = new List<string>();
-        public IfStatementManager(CommandParser commandParser)
+        public IfStatementManager( VariableManager variableManager)
+        {
+            this.variableManager = variableManager;
+        }
+
+        /// <summary>
+        /// Sets the command parser instance to be used by the class
+        /// </summary>
+        /// <param name="commandParser"></param>
+        public void SetCommandParser(CommandParser commandParser)
         {
             this.commandParser = commandParser;
         }
+
+        /// <summary>
+        /// Starts the process of handling an if statemnt
+        /// </summary>
+        /// <param name="command"></param>
         public void StartIfStatement(string command)
         {
-            //extract the condition from the if statement 
+           
             string condition = ExtractCondition(command);
-            //Evaluate the extracted condition and store the result
-            conditionResult = EvaluateCondition(condition);
+            
+            conditionResult = EvaluateCondition(condition, commandParser);
         }
 
+        /// <summary>
+        /// Adds a command to the current if statement block, to be executed if the condition is true
+        /// </summary>
+        /// <param name="command"></param>
         public void AddCommand(string command)
         {
-            //If the condition is true add the command to the block for execution
+            
             if (conditionResult)
             {
                 commandBlock.Add(command);
             }
         }
 
+        /// <summary>
+        /// If the condition strikes true, commandblock will be executed. commandblock is cleared from memory wheter the command block is true
+        /// or not.
+        /// </summary>
+        /// <param name="commandParser"></param>
         public void EndIfStatement(CommandParser commandParser)
         {
-            //If the condition is true, execute all commands in the block
+            
             if (conditionResult)
             {
                 foreach (var cmd in commandBlock)
@@ -47,7 +74,11 @@ namespace WindowsFormsApp1
             //Clear the command block after execution or if the condition was false
             commandBlock.Clear();
         }
-
+        /// <summary>
+        /// Extracts the condition expression from the if statement command string
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns>the condition expression</returns>
         private string ExtractCondition(string command)
         {
             //split the command by space and take the parts after the 'if' 
@@ -56,25 +87,32 @@ namespace WindowsFormsApp1
             {
                 throw new ArgumentException("Invalid if statement format.");
             }
-            return parts[1].Trim;
+            return parts[1].Trim();
 
         }
 
+        /// <summary>
+        /// Evaluates a condition string within the if statement. The method parses the condition, resolves any variables, and applies
+        /// the specified comparionson operator. 
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="commandParser"></param>
+        /// <returns>a boolean value indicating the result of the condition evaluation</returns>
         public bool EvaluateCondition(string condition, CommandParser commandParser)
         {
-            //split the conditions into operands and operators
+            
             var tokens = condition.Split(' ');
             if (tokens.Length != 3)
             {
                 throw new ArgumentException("Invalid Condition Format");
             }
 
-            //Resovle variable values or parse integers
-            int leftOperand = ResolveArgumentToInteger(arg[0]);
-            int rightOperand = ResolveArgumentToInteger(tokens[2]);
+        
+            int leftOperand = CommandFactory.ResolveArgumentToInteger(tokens[0], variableManager);
+            int rightOperand = CommandFactory.ResolveArgumentToInteger(tokens[2], variableManager);
             string operatorToken = tokens[1];
 
-            // Perform comparison based on the operator
+            
             switch (operatorToken)
             {
                 case "<":
@@ -97,4 +135,4 @@ namespace WindowsFormsApp1
 
         
     }
-} */
+} 
