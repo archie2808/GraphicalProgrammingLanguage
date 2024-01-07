@@ -30,7 +30,7 @@ namespace WindowsFormsApp1
 
             int value = EvaluateVarExpression(expression); 
             Console.WriteLine($"Processing variable assignment: {command}");
-            SetVariable(varName, value);
+            SetVariable(varName, value); 
         }
 
         private int EvaluateVarExpression(string expression)
