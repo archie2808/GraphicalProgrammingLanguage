@@ -21,6 +21,7 @@ namespace WindowsFormsApp1
         private Bitmap drawingSurface;
         private string defaultDirectory;
         private IfStatementManager ifStatementManager;
+        private LoopManager loopManager;
 
         /// <summary>
         /// Initialized a new instance of the <c>Form1</c> class
@@ -36,18 +37,20 @@ namespace WindowsFormsApp1
             pictureBox1.Image = drawingSurface;
             variableManager = new VariableManager();
             ifStatementManager = new IfStatementManager(variableManager);
-            
-            commandParser = new CommandParser(textBox2, drawingSurface, variableManager, ifStatementManager);
-            ifStatementManager.SetCommandParser(commandParser);
+            ifStatementManager.IfExMsg += updateUI;
+            loopManager = new LoopManager(variableManager);
+            commandParser = new CommandParser(textBox2, drawingSurface, variableManager, ifStatementManager, loopManager);
+            ifStatementManager.SetCommandParserIf(commandParser);
+            loopManager.SetCommandParserLoop(commandParser);
             defaultDirectory = @"C:\Users\archi\OneDrive - Leeds Beckett University\YEAR 3\ASE\SCRIPTS";
             
         }
 
+        private void updateUI(string message)
+        {
+            errorLabel.Text = message + Environment.NewLine;
+        }
 
-        /// <summary>
-        /// Refreshes the drawing surface for testing purposes.
-        /// </summary>
-        /// <remarks>
         /// This method is used to refresh the PictureBox control that displays the drawing surface.
         /// It's particularly useful in a testing context where the visual state of the drawing surface needs to be updated
         /// to reflect changes made during tests. This method ensures that the latest state of the Bitmap is rendered in the PictureBox.

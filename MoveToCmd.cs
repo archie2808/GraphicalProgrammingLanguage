@@ -12,19 +12,21 @@ namespace WindowsFormsApp1
     /// </summary>
     public class MoveToCommand : ICommand
     {
-        
-        private  Point newPosition;
-        public Point NewPenPosition { get; private set; }
 
-        public MoveToCommand( Point newPosition)
+        private UpdatePenPositionDelegate updatePenPosition;
+        private Point newPosition;
+
+
+
+        public MoveToCommand( Point newPosition, UpdatePenPositionDelegate updatePenPositionDelegate)
         {
-          
             this.newPosition = newPosition;
+            this.updatePenPosition = updatePenPositionDelegate;
         }
 
         public void Execute()
         {
-            NewPenPosition = newPosition;
+            updatePenPosition(newPosition);
         }
     }
 }

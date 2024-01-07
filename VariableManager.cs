@@ -26,16 +26,26 @@ namespace WindowsFormsApp1
         {
             string[] parts = command.Split('=');
             string varName = parts[0].Trim();
+            string expression = parts[1].Trim();
 
-            if (int.TryParse(parts[1].Trim(), out int value))
-            {
-                SetVariable(varName, value);
-            }
-            else
-            {
-                throw new InvalidOperationException("Invalid value for variable assignment");
-            }
+            int value = EvaluateVarExpression(expression); 
+            Console.WriteLine($"Processing variable assignment: {command}");
+            SetVariable(varName, value);
         }
+
+        private int EvaluateVarExpression(string expression)
+        {
+            string[] tokens = expression.Split(new char[] { ' ', '+' }, StringSplitOptions.RemoveEmptyEntries);
+            int result = 0;
+
+            foreach (string token in tokens)
+            {
+                result += ResolveArgumentToInteger(token);
+            }
+
+            return result;
+        }
+
 
         /// <summary>
         /// Responsible for setting the new variable value 
@@ -47,7 +57,10 @@ namespace WindowsFormsApp1
         /// </remarks>
         public void SetVariable(string name, int value)
         {
+            
+            
             variables[name] = value;
+            Console.WriteLine($"Setting variable {name} to {value}");
         }
 
         /// <summary>
@@ -79,8 +92,16 @@ namespace WindowsFormsApp1
             return variables.ContainsKey(name);
         }
 
-        
-        
-        
+        private int ResolveArgumentToInteger(string arg)
+        {
+            if (IsVariableDefined(arg))
+                return GetVariable(arg);
+            else if (int.TryParse(arg, out int result))
+                return result;
+
+            throw new ArgumentException($"Invalid argument: {arg}");
+        }
+
+
     }
 }

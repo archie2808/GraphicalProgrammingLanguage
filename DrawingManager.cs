@@ -107,12 +107,6 @@ namespace WindowsFormsApp1
         public void DrawCircle(Point center, int radius)
         {
             
-            
-
-            if (OutOfBoundsCircle(center, radius))
-            {
-                throw new ArgumentException("Circle dimensions out of bounds. Redraw the circle within the bounds of the drawing surface.");
-            }
 
             using (Graphics g = Graphics.FromImage(drawingSurface))
             {
@@ -120,22 +114,6 @@ namespace WindowsFormsApp1
             }
         }
 
-        /// <summary>
-        /// Checks if a cirlce is out of the bounds of the drawing surface.
-        /// </summary>
-        /// <param name="center"></param>
-        /// <param name="radius"></param>
-        /// <returns>
-        /// This method determines whether, based on the given center and radius, 
-        /// would exceed the boundaries of the drawing surface.
-        /// </returns>
-        private bool OutOfBoundsCircle(Point center, int radius)
-        {
-            return (center.X - radius < 0) ||
-                   (center.Y - radius < 0) ||
-                   (center.X + radius > drawingSurface.Width) ||
-                   (center.Y + radius > drawingSurface.Height);
-        }
 
         /// <summary>
         /// Draws a Rectangle on the drawing surface

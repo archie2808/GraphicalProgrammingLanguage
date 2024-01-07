@@ -60,6 +60,7 @@
     </Compile>
     <Compile Include="IfStatementManager.cs" />
     <Compile Include="ICommand.cs" />
+    <Compile Include="LoopManager.cs" />
     <Compile Include="MoveToCmd.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

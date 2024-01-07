@@ -13,7 +13,9 @@ namespace WindowsFormsApp1
     {
         private CommandParser commandParser;
         private VariableManager variableManager; 
-        private bool conditionResult; 
+        private bool conditionResult;
+
+        public Action<string> IfExMsg;
 
         //list to store the commands inside the if statements block 
         private List<String> commandBlock = new List<string>();
@@ -26,7 +28,7 @@ namespace WindowsFormsApp1
         /// Sets the command parser instance to be used by the class
         /// </summary>
         /// <param name="commandParser"></param>
-        public void SetCommandParser(CommandParser commandParser)
+        public void SetCommandParserIf(CommandParser commandParser)
         {
             this.commandParser = commandParser;
         }
@@ -63,15 +65,22 @@ namespace WindowsFormsApp1
         /// <param name="commandParser"></param>
         public void EndIfStatement(CommandParser commandParser)
         {
-            
+
             if (conditionResult)
             {
-                foreach (var cmd in commandBlock)
+                try
                 {
-                    commandParser.ExecuteCommand(cmd);
+                    foreach (var cmd in commandBlock)
+                    {
+                        commandParser.ExecuteCommand(cmd);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    IfExMsg?.Invoke("Error: " + ex.Message);
                 }
             }
-            //Clear the command block after execution or if the condition was false
+
             commandBlock.Clear();
         }
         /// <summary>
@@ -81,7 +90,7 @@ namespace WindowsFormsApp1
         /// <returns>the condition expression</returns>
         private string ExtractCondition(string command)
         {
-            //split the command by space and take the parts after the 'if' 
+            
             var parts = command.Split(new char[] { ' ' }, 2);
             if (parts.Length < 2)
             {

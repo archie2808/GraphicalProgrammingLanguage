@@ -8,6 +8,7 @@ using System.Drawing;
 
 namespace WindowsFormsApp1
 {
+    public delegate void UpdatePenPositionDelegate(Point newPosition);
     /// <summary>
     /// The <c>CommandParser</c> class is responsible for interpreting and executing user commands. 
     /// </summary>
@@ -16,10 +17,12 @@ namespace WindowsFormsApp1
        
         private Bitmap drawingSurface;
         private TextBox outputTextBox;
+        private LoopManager loopManager;
         private DrawingManager drawingManager;
         private IfStatementManager ifStatementManager;
         private VariableManager variableManager;
         private Point penPosition;
+        
 
         /// <summary>
         /// Gets the current position of the pen at the drawing surface
@@ -55,7 +58,7 @@ namespace WindowsFormsApp1
         /// <param name="surface">The Bitmap surface on which drawing commands are executed.</param>
         /// <param name="vm">The variable manager for managing script variables.</param>
         /// <param name="ifStatementManager">The if statement manager for handling conditional commands.</param>
-        public CommandParser(TextBox output, Bitmap surface, VariableManager vm, IfStatementManager ifStatementManager)
+        public CommandParser(TextBox output, Bitmap surface, VariableManager vm, IfStatementManager ifStatementManager, LoopManager loopManager)
         {
             penPosition = new Point(0, 0);
             outputTextBox = output;
@@ -63,6 +66,9 @@ namespace WindowsFormsApp1
             drawingManager = new DrawingManager(surface);
             variableManager = vm;
             this.ifStatementManager = ifStatementManager;
+            this.loopManager = loopManager;
+            UpdatePenPositionAction = (newPosition) => { penPosition = newPosition; };
+
         }
 
         //Flag to indicate if we are currently processing commands inside of an if block
@@ -79,34 +85,42 @@ namespace WindowsFormsApp1
         /// </remarks>
         public void IfStatementExecution(string command)
         {
-            //Check if the command is the start of an if statement
-            if (command.StartsWith("if"))
-            {
-                //Set the flag to true upon entering if statement
-                isInsideIfStatement = true;
-                //Delegation of logic to IfStatementManager
-                ifStatementManager.StartIfStatement(command);
+            try
+            { 
+                
+                if (command.StartsWith("if"))
+                {
+                    
+                    isInsideIfStatement = true;
+                    
+                    ifStatementManager.StartIfStatement(command);
+                }
+
+                
+                else if (command == "endif")
+                {
+                     
+                    isInsideIfStatement = false;
+                    
+                    ifStatementManager.EndIfStatement(this);
+                }
+
+                
+                else if (isInsideIfStatement)
+                {
+                    
+                    ifStatementManager.AddCommand(command);
+                }
+
+                else
+                {
+                    ExecuteCommand(command);
+                }
             }
 
-            //check if the command signifies the end of the if statement
-            else if (command == "endif")
+            catch (Exception ex)
             {
-                //set flag to false
-                isInsideIfStatement = false;
-                //delegation of logic to IfStatementManager
-                ifStatementManager.EndIfStatement(this);
-            }
-
-            //check if we are inside if statement block
-            else if (isInsideIfStatement)
-            {
-                //Add the command to the current if statement block in IfStatementManager
-                ifStatementManager.AddCommand(command);
-            }
-
-            else
-            {
-                ExecuteCommand(command);
+                outputTextBox.AppendText($"Error Processing command: {ex.Message}\n");
             }
         }
         /// <summary>
@@ -120,35 +134,56 @@ namespace WindowsFormsApp1
         /// </remarks>
         public void ExecuteCommand(string commandString)
         {
+            Console.WriteLine($"executing command: {commandString}");
 
             commandString = commandString.Trim();
             if (string.IsNullOrEmpty(commandString))
             {
                 throw new InvalidOperationException("no command to execute");
-
             }
 
-            if (commandString == "reset")
+            if (commandString.StartsWith("while"))
             {
-                ResetCommand();
-                return;
+                loopManager.StartLoop(commandString);
             }
-
-            if (commandString.Contains("="))
+            else if (commandString.Trim().ToLower() == "endwhile")
             {
-                variableManager.ProcessVariableAssignment(commandString);
-                return;
+                loopManager.EndLoop();
             }
-
             
-            if (commandString.StartsWith("if") || commandString =="endif" || isInsideIfStatement)
+            else if (loopManager.IsLoopActive)
             {
-                IfStatementExecution(commandString);
-                return;
+                loopManager.AddCommandToLoop(commandString);
             }
 
-            ExecuteSingleCommand(commandString);
+            else
+            {
+                if (commandString == "reset")
+                {
+                    ResetCommand();
+                    return;
+                }
+
+                if (commandString.Contains("="))
+                {
+                    variableManager.ProcessVariableAssignment(commandString);
+
+                    return;
+                }
+
+
+                if (commandString.StartsWith("if") || commandString == "endif" || isInsideIfStatement)
+                {
+                    IfStatementExecution(commandString);
+                    return;
+                }
+
+                ExecuteSingleCommand(commandString);
+            }
+
         }
+
+
 
         /// <summary>
         /// Executes a single, isolated command, typically a drawing command. This method is focused on parsing and executing commands 
@@ -173,7 +208,7 @@ namespace WindowsFormsApp1
                     commandParts[i] = resolvedValue.ToString();  // Convert the int back to a string
                 }
             }
-            ICommand command = CommandFactory.CreateCommand( action, arguments, drawingManager, variableManager, penPosition);
+            ICommand command = CommandFactory.CreateCommand( action, arguments, drawingManager, variableManager,penPosition, UpdatePenPositionAction );
             command.Execute();
 
         }
@@ -210,7 +245,10 @@ namespace WindowsFormsApp1
             outputTextBox.AppendText("Pen position reset to top-left corner.\n");
         }
 
-      
+        
+
+        public UpdatePenPositionDelegate UpdatePenPositionAction { get; set; }
+
     }
 }
     

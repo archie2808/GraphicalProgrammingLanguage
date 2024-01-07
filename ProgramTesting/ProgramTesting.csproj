@@ -55,6 +55,7 @@
     <Compile Include="CommandParsingTests.cs" />
     <Compile Include="DrawingTests1.cs" />
     <Compile Include="ErrorHandlingTests.cs" />
+    <Compile Include="IfstatementTesting.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VariableTest.cs" />
   </ItemGroup>

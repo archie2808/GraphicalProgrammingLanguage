@@ -30,7 +30,7 @@ namespace WindowsFormsApp1
         /// <exception cref="InvalidOperationException">Thrown when an unknown command type is encountered.</exception>
         /// <exception cref="ArgumentException">Thrown when the provided arguments are insufficient or invalid for the specified command.</exception>
         public static ICommand CreateCommand(string commandString,string[] arguments, DrawingManager drawingManager,
-            VariableManager variableManager, Point penPosition)
+            VariableManager variableManager, Point penPosition, UpdatePenPositionDelegate updatePenPositionDelegate)
         {
             var parts = commandString.Split(' ');
             var commandName = parts[0].ToLower();
@@ -39,7 +39,7 @@ namespace WindowsFormsApp1
             switch (commandName)
             {
                 case "moveto":
-                    return CreateMoveToCommand(arguments, variableManager);
+                    return CreateMoveToCommand(arguments, variableManager, updatePenPositionDelegate);
 
                 case "drawto":
                     return CreateDrawToCommand(arguments, drawingManager, variableManager, penPosition);
@@ -70,14 +70,14 @@ namespace WindowsFormsApp1
         /// <remarks>
         /// This method updates the pen position based on the coordinates provided in the command.
         /// </remarks>
-        private static ICommand CreateMoveToCommand(string[] args, VariableManager variableManager)
+        private static ICommand CreateMoveToCommand(string[] args, VariableManager variableManager, UpdatePenPositionDelegate updatePenPositionDelegate)
         {
-            if (args.Length < 2) throw new ArgumentException("Insufficient arguments for 'moveto' command.");
+            if (args.Length != 2) throw new ArgumentException("Insufficient arguments for 'moveto' command.");
 
             int x = ResolveArgumentToInteger(args[0], variableManager);
             int y = ResolveArgumentToInteger(args[1], variableManager);
 
-            return new MoveToCommand( new Point(x, y));
+            return new MoveToCommand( new Point(x, y), updatePenPositionDelegate);
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace WindowsFormsApp1
         /// </remarks>
         private static ICommand CreateDrawToCommand(string[] args, DrawingManager drawingManager, VariableManager variableManager, Point penPosition)
         {
-            if (args.Length < 2) throw new ArgumentException("Insufficient arguments for 'drawto' command.");
+            if (args.Length != 2) throw new ArgumentException("Insufficient arguments for 'drawto' command.");
 
             int x = ResolveArgumentToInteger(args[0], variableManager);
             int y = ResolveArgumentToInteger(args[1], variableManager);
@@ -109,7 +109,7 @@ namespace WindowsFormsApp1
         /// </remarks>
         private static ICommand CreateCircleCommand(string[] args, DrawingManager drawingManager, VariableManager variableManager, Point penPosition)
         {
-            if (args.Length < 1) throw new ArgumentException("Insufficient arguments for 'circle' command.");
+            if (args.Length != 1) throw new ArgumentException("Insufficient arguments for 'circle' command.");
 
             int radius = ResolveArgumentToInteger(args[0], variableManager);
 
@@ -126,7 +126,7 @@ namespace WindowsFormsApp1
         /// </remarks>
         private static ICommand CreateColourCommand(string[] args, DrawingManager drawingManager)
         {
-            if (args.Length < 1) throw new ArgumentException("Insufficient arguments for 'colour' command.");
+            if (args.Length != 1) throw new ArgumentException("Insufficient arguments for 'colour' command.");
 
             string colourName = args[0].Trim();
 
@@ -144,7 +144,7 @@ namespace WindowsFormsApp1
         /// </remarks>
         private static ICommand CreateRectangleCommand(string[] args, DrawingManager drawingManager, VariableManager variableManager, Point penPosition)
         {
-            if (args.Length < 2) throw new ArgumentException("Insufficient arguments for 'rectangle' command.");
+            if (args.Length != 2) throw new ArgumentException("Insufficient arguments for 'rectangle' command.");
 
             int width = ResolveArgumentToInteger(args[0], variableManager);
             int height = ResolveArgumentToInteger(args[1], variableManager);
@@ -162,7 +162,7 @@ namespace WindowsFormsApp1
         /// </remarks>
         private static ICommand CreateTriangleCommand(string[] args, DrawingManager drawingManager, VariableManager variableManager, Point penPosition)
         {
-            if (args.Length < 3) throw new ArgumentException("Insufficient arguments for 'triangle' command.");
+            if (args.Length != 3) throw new ArgumentException("Insufficient arguments for 'triangle' command.");
 
             int x = ResolveArgumentToInteger(args[0], variableManager);
             int y = ResolveArgumentToInteger(args[1], variableManager);
