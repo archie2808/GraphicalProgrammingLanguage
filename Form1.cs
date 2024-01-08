@@ -23,6 +23,7 @@ namespace WindowsFormsApp1
         private IfStatementManager ifStatementManager;
         private LoopManager loopManager;
         private SyntaxChecker syntaxChecker;
+       
 
         /// <summary>
         /// Initialized a new instance of the <c>Form1</c> class
@@ -40,7 +41,7 @@ namespace WindowsFormsApp1
             ifStatementManager = new IfStatementManager(variableManager);
             ifStatementManager.IfExMsg += updateUI;
             loopManager = new LoopManager(variableManager);
-            commandParser = new CommandParser(textBox2, drawingSurface, variableManager, ifStatementManager, loopManager);
+            commandParser = new CommandParser(textBox2, drawingSurface, variableManager, ifStatementManager, loopManager );
             ifStatementManager.SetCommandParserIf(commandParser);
             loopManager.SetCommandParserLoop(commandParser);
             syntaxChecker = new SyntaxChecker(variableManager);

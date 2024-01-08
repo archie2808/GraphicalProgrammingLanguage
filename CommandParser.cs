@@ -17,12 +17,16 @@ namespace WindowsFormsApp1
        
         private Bitmap drawingSurface;
         private TextBox outputTextBox;
+        private MethodManager methodManager;
         private LoopManager loopManager;
         private DrawingManager drawingManager;
         private IfStatementManager ifStatementManager;
         private VariableManager variableManager;
         private Point penPosition;
         private SyntaxChecker syntaxChecker;
+        
+        private int currentLineNumber;
+        
         
 
         /// <summary>
@@ -66,6 +70,8 @@ namespace WindowsFormsApp1
             drawingSurface = surface;
             drawingManager = new DrawingManager(surface);
             variableManager = vm;
+            
+            this.methodManager = new MethodManager(variableManager);
             this.ifStatementManager = ifStatementManager;
             this.loopManager = loopManager;
             UpdatePenPositionAction = (newPosition) => { penPosition = newPosition; };
@@ -144,8 +150,27 @@ namespace WindowsFormsApp1
                 {
                     throw new InvalidOperationException("no command to execute");
                 }
+                // Increment line number for each command
+                currentLineNumber++;
 
-                if (commandString.StartsWith("while"))
+                // Handling different types of commands...
+                if (commandString.StartsWith("method"))
+                {
+                    var (methodName, parameters) = ExtractMethodNameAndParameters(commandString);
+                    methodManager.DefineMethod(methodName, currentLineNumber, parameters);
+                }
+                else if (commandString.StartsWith("endmethod"))
+                {
+                    var methodName = ExtractMethodName(commandString);
+                    methodManager.EndMethodDefinition(methodName, currentLineNumber);
+                }
+                else if (commandString.StartsWith("call"))
+                {
+                    var (methodName, arguments) = ExtractMethodCallDetails(commandString);
+                    methodManager.CallMethod(methodName, arguments);
+                }
+
+                else if (commandString.StartsWith("while"))
                 {
                     loopManager.StartLoop(commandString);
                 }
@@ -161,6 +186,8 @@ namespace WindowsFormsApp1
 
                 else
                 {
+
+
                     if (commandString == "reset")
                     {
                         ResetCommand();
@@ -189,11 +216,44 @@ namespace WindowsFormsApp1
                 outputTextBox.AppendText($"Syntax error: {ex.Message}\n");
                 
             }
-            catch (Exception ex) // Catch all other runtime errors
+            catch (Exception ex) 
             {
                 outputTextBox.AppendText($"Error executing command: {ex.Message}\n");
                 
             }
+        }
+
+        private (string methodName, string[] parameters) ExtractMethodNameAndParameters(string commandString)
+        {
+            
+            var parts = commandString.Split(new char[] { ' ' }, 2);
+            var methodName = parts[1].Split(new char[] { ' ' }, 2)[0].Trim();
+            var parametersPart = parts[1].Substring(methodName.Length).Trim();
+            var parameters = parametersPart.Split(',')
+                                           .Select(param => param.Trim())
+                                           .Where(param => !string.IsNullOrEmpty(param))
+                                           .ToArray();
+            return (methodName, parameters);
+        }
+
+        private string ExtractMethodName(string commandString)
+        {
+            
+            var parts = commandString.Split(' ');
+            return parts[1].Trim();
+        }
+
+        private (string methodName, string[] arguments) ExtractMethodCallDetails(string commandString)
+        {
+            
+            var parts = commandString.Split(new char[] { ' ' }, 2);
+            var methodName = parts[1].Split(new char[] { ' ' }, 2)[0].Trim();
+            var argumentsPart = parts[1].Substring(methodName.Length).Trim();
+            var arguments = argumentsPart.Split(',')
+                                         .Select(arg => arg.Trim())
+                                         .Where(arg => !string.IsNullOrEmpty(arg))
+                                         .ToArray();
+            return (methodName, arguments);
         }
 
 
@@ -249,9 +309,11 @@ namespace WindowsFormsApp1
 
                 
                 string[] lines = script.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                currentLineNumber = 0;
                 foreach (var line in lines)
                 {
-                    ExecuteCommand(line); 
+                    ExecuteCommand(line);
+                    currentLineNumber++;
                 }
             }
             catch (SyntaxException ex)
