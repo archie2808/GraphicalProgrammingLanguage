@@ -22,6 +22,7 @@ namespace WindowsFormsApp1
         private IfStatementManager ifStatementManager;
         private VariableManager variableManager;
         private Point penPosition;
+        private SyntaxChecker syntaxChecker;
         
 
         /// <summary>
@@ -68,7 +69,7 @@ namespace WindowsFormsApp1
             this.ifStatementManager = ifStatementManager;
             this.loopManager = loopManager;
             UpdatePenPositionAction = (newPosition) => { penPosition = newPosition; };
-
+            syntaxChecker = new SyntaxChecker(variableManager);
         }
 
         //Flag to indicate if we are currently processing commands inside of an if block
@@ -118,7 +119,7 @@ namespace WindowsFormsApp1
                 }
             }
 
-            catch (Exception ex)
+            catch (SyntaxException ex)
             {
                 outputTextBox.AppendText($"Error Processing command: {ex.Message}\n");
             }
@@ -134,53 +135,65 @@ namespace WindowsFormsApp1
         /// </remarks>
         public void ExecuteCommand(string commandString)
         {
-            Console.WriteLine($"executing command: {commandString}");
+            try
+            {
+                Console.WriteLine($"executing command: {commandString}");
 
-            commandString = commandString.Trim();
-            if (string.IsNullOrEmpty(commandString))
-            {
-                throw new InvalidOperationException("no command to execute");
-            }
-
-            if (commandString.StartsWith("while"))
-            {
-                loopManager.StartLoop(commandString);
-            }
-            else if (commandString.Trim().ToLower() == "endwhile")
-            {
-                loopManager.EndLoop();
-            }
-            
-            else if (loopManager.IsLoopActive)
-            {
-                loopManager.AddCommandToLoop(commandString);
-            }
-
-            else
-            {
-                if (commandString == "reset")
+                commandString = commandString.Trim();
+                if (string.IsNullOrEmpty(commandString))
                 {
-                    ResetCommand();
-                    return;
+                    throw new InvalidOperationException("no command to execute");
                 }
 
-                if (commandString.Contains("="))
+                if (commandString.StartsWith("while"))
                 {
-                    variableManager.ProcessVariableAssignment(commandString);
-
-                    return;
+                    loopManager.StartLoop(commandString);
+                }
+                else if (commandString.Trim().ToLower() == "endwhile")
+                {
+                    loopManager.EndLoop();
                 }
 
-
-                if (commandString.StartsWith("if") || commandString == "endif" || isInsideIfStatement)
+                else if (loopManager.IsLoopActive)
                 {
-                    IfStatementExecution(commandString);
-                    return;
+                    loopManager.AddCommandToLoop(commandString);
                 }
 
-                ExecuteSingleCommand(commandString);
+                else
+                {
+                    if (commandString == "reset")
+                    {
+                        ResetCommand();
+                        return;
+                    }
+
+                    if (commandString.Contains("="))
+                    {
+                        variableManager.ProcessVariableAssignment(commandString);
+
+                        return;
+                    }
+
+
+                    if (commandString.StartsWith("if") || commandString == "endif" || isInsideIfStatement)
+                    {
+                        IfStatementExecution(commandString);
+                        return;
+                    }
+
+                    ExecuteSingleCommand(commandString);
+                }
             }
-
+            catch (SyntaxException ex)
+            {
+                outputTextBox.AppendText($"Syntax error: {ex.Message}\n");
+                
+            }
+            catch (Exception ex) // Catch all other runtime errors
+            {
+                outputTextBox.AppendText($"Error executing command: {ex.Message}\n");
+                
+            }
         }
 
 
@@ -195,31 +208,55 @@ namespace WindowsFormsApp1
         /// DrawingManager for the actual drawing operations.
         /// </remarks>
         public void ExecuteSingleCommand(string commandString)
-        { 
-            string[] commandParts = commandString.Split(' ');
-            string action = commandParts[0].ToLower();
-            string[] arguments = commandParts.Skip(1).ToArray();
-
-            if (action != "colour")
+        {
+            try
             {
-                for (int i = 1; i < commandParts.Length; i++)
+                string[] commandParts = commandString.Split(' ');
+                string action = commandParts[0].ToLower();
+                string[] arguments = commandParts.Skip(1).ToArray();
+
+                if (action != "colour")
                 {
-                    int resolvedValue = CommandFactory.ResolveArgumentToInteger(commandParts[i], variableManager);
-                    commandParts[i] = resolvedValue.ToString();  // Convert the int back to a string
+                    for (int i = 1; i < commandParts.Length; i++)
+                    {
+                        int resolvedValue = CommandFactory.ResolveArgumentToInteger(commandParts[i], variableManager);
+                        commandParts[i] = resolvedValue.ToString();  // Convert the int back to a string
+                    }
                 }
+                ICommand command = CommandFactory.CreateCommand(action, arguments, drawingManager, variableManager, penPosition, UpdatePenPositionAction);
+                command.Execute();
             }
-            ICommand command = CommandFactory.CreateCommand( action, arguments, drawingManager, variableManager,penPosition, UpdatePenPositionAction );
-            command.Execute();
+            catch (ArgumentException ex)
+            {
+                outputTextBox.AppendText($"Argument error: {ex.Message}\n");
+               
+            }
+            catch (Exception ex)
+            {
+                outputTextBox.AppendText($"Error during command execution: {ex.Message}\n");
+                
+            }
+
 
         }
   
         public void ExecuteScript(string script)
         {
-            string[] lines = script.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-            foreach (var line in lines)
+            try
             {
-                ExecuteCommand(line);
+                syntaxChecker.CheckSyntax(script); 
+
+                
+                string[] lines = script.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var line in lines)
+                {
+                    ExecuteCommand(line); 
+                }
+            }
+            catch (SyntaxException ex)
+            {
+                // Handle syntax error
             }
         }
 

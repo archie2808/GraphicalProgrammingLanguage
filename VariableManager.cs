@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace WindowsFormsApp1
@@ -32,15 +33,43 @@ namespace WindowsFormsApp1
             Console.WriteLine($"Processing variable assignment: {command}");
             SetVariable(varName, value); 
         }
-
+        /// <summary>
+        /// Evaluates the expression withhin a variable
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns>The value of the expression assocates with the variable</returns>
         private int EvaluateVarExpression(string expression)
         {
-            string[] tokens = expression.Split(new char[] { ' ', '+' }, StringSplitOptions.RemoveEmptyEntries);
-            int result = 0;
+            // Split expression into tokens considering various operators
+            var tokens = Regex.Split(expression, @"([+\-*/])").Where(t => t != string.Empty).ToArray();
+            int result = ResolveArgumentToInteger(tokens[0]);
 
-            foreach (string token in tokens)
+            for (int i = 1; i < tokens.Length; i += 2)
             {
-                result += ResolveArgumentToInteger(token);
+                string operatorToken = tokens[i];
+                int nextValue = ResolveArgumentToInteger(tokens[i + 1]);
+
+                switch (operatorToken)
+                {
+                    case "+":
+                        result += nextValue;
+                        break;
+                    case "-":
+                        result -= nextValue;
+                        break;
+                    case "*":
+                        result *= nextValue;
+                        break;
+                    case "/":
+                        if (nextValue == 0)
+                        {
+                            throw new DivideByZeroException("Cannot divide by zero.");
+                        }
+                        result /= nextValue;
+                        break;
+                    default:
+                        throw new ArgumentException($"Invalid operator: {operatorToken}");
+                }
             }
 
             return result;
@@ -95,11 +124,17 @@ namespace WindowsFormsApp1
         private int ResolveArgumentToInteger(string arg)
         {
             if (IsVariableDefined(arg))
+            {
                 return GetVariable(arg);
+            }
             else if (int.TryParse(arg, out int result))
+            {
                 return result;
-
-            throw new ArgumentException($"Invalid argument: {arg}");
+            }
+            else
+            {
+                throw new InvalidOperationException($"difficulty resolving argument of type String to type Int: {arg}");
+            }
         }
 
 

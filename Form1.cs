@@ -22,6 +22,7 @@ namespace WindowsFormsApp1
         private string defaultDirectory;
         private IfStatementManager ifStatementManager;
         private LoopManager loopManager;
+        private SyntaxChecker syntaxChecker;
 
         /// <summary>
         /// Initialized a new instance of the <c>Form1</c> class
@@ -42,6 +43,7 @@ namespace WindowsFormsApp1
             commandParser = new CommandParser(textBox2, drawingSurface, variableManager, ifStatementManager, loopManager);
             ifStatementManager.SetCommandParserIf(commandParser);
             loopManager.SetCommandParserLoop(commandParser);
+            syntaxChecker = new SyntaxChecker(variableManager);
             defaultDirectory = @"C:\Users\archi\OneDrive - Leeds Beckett University\YEAR 3\ASE\SCRIPTS";
             
         }
@@ -138,7 +140,21 @@ namespace WindowsFormsApp1
 
         private void button2_Click(object sender, EventArgs e)
         {
-
+            try
+            {
+                string script = textBox2.Text;
+                syntaxChecker.CheckSyntax(script);
+                errorLabel.Text = "Syntax looks good!";
+                   
+            }
+            catch (SyntaxException ex)
+            {
+                errorLabel.Text =$"Syntax error: {ex.Message}";
+            }
+            catch (Exception ex)
+            {
+                errorLabel.Text = $"Execution error: {ex.Message}";
+            }
         }                            
 
         private void pictureBox1_Click(object sender, EventArgs e)

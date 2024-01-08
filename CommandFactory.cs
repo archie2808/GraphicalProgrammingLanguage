@@ -192,7 +192,7 @@ namespace WindowsFormsApp1
             }
             else
             {
-                throw new ArgumentException($"Invalid argument: {arg}");
+                throw new InvalidOperationException($"difficulty resolving argument of type String to type Int: {arg}");
             }
         }
     }
