@@ -23,9 +23,11 @@ namespace WindowsFormsApp1
         private IfStatementManager ifStatementManager;
         private VariableManager variableManager;
         private Point penPosition;
+        private ScriptManager scriptManager; 
+         
         private SyntaxChecker syntaxChecker;
+
         
-        private int currentLineNumber;
         
         
 
@@ -63,15 +65,15 @@ namespace WindowsFormsApp1
         /// <param name="surface">The Bitmap surface on which drawing commands are executed.</param>
         /// <param name="vm">The variable manager for managing script variables.</param>
         /// <param name="ifStatementManager">The if statement manager for handling conditional commands.</param>
-        public CommandParser(TextBox output, Bitmap surface, VariableManager vm, IfStatementManager ifStatementManager, LoopManager loopManager)
+        public CommandParser(TextBox output, Bitmap surface, VariableManager vm, IfStatementManager ifStatementManager, LoopManager loopManager, ScriptManager scriptManager, SyntaxChecker syntaxChecker)
         {
             penPosition = new Point(0, 0);
             outputTextBox = output;
             drawingSurface = surface;
             drawingManager = new DrawingManager(surface);
             variableManager = vm;
-            
-            this.methodManager = new MethodManager(variableManager);
+            this.scriptManager = scriptManager;
+            this.methodManager = new MethodManager(variableManager, scriptManager, this);
             this.ifStatementManager = ifStatementManager;
             this.loopManager = loopManager;
             UpdatePenPositionAction = (newPosition) => { penPosition = newPosition; };
@@ -141,6 +143,7 @@ namespace WindowsFormsApp1
         /// </remarks>
         public void ExecuteCommand(string commandString)
         {
+            
             try
             {
                 Console.WriteLine($"executing command: {commandString}");
@@ -151,24 +154,36 @@ namespace WindowsFormsApp1
                     throw new InvalidOperationException("no command to execute");
                 }
                 // Increment line number for each command
-                currentLineNumber++;
+                if (commandString.StartsWith("call"))
+                {
+                    if (methodManager.IsExecuting() && commandString.StartsWith("call"))
+                    {
+                        // Skip execution of 'call' command within method execution context
+                        return;
+                    }
+
+                    var (methodName, arguments) = ExtractMethodCallDetails(commandString);
+                    //ProcessMethodVariableAssignments(methodName);
+                    methodManager.CallMethod(methodName, arguments);
+                }
 
                 // Handling different types of commands...
-                if (commandString.StartsWith("method"))
+                else if (commandString.StartsWith("method"))
                 {
                     var (methodName, parameters) = ExtractMethodNameAndParameters(commandString);
-                    methodManager.DefineMethod(methodName, currentLineNumber, parameters);
+                    int startLine = scriptManager.GetCurrentLineNumber(); // Assuming this method returns the current line number
+                    methodManager.DefineMethod(methodName, startLine, parameters);
                 }
                 else if (commandString.StartsWith("endmethod"))
                 {
-                    var methodName = ExtractMethodName(commandString);
-                    methodManager.EndMethodDefinition(methodName, currentLineNumber);
+                    int endLine = scriptManager.GetCurrentLineNumber();
+                    methodManager.EndMethodDefinition( endLine);
                 }
-                else if (commandString.StartsWith("call"))
+                else if (methodManager.IsDefiningMethod)
                 {
-                    var (methodName, arguments) = ExtractMethodCallDetails(commandString);
-                    methodManager.CallMethod(methodName, arguments);
+                    methodManager.AddCommand(commandString);
                 }
+               
 
                 else if (commandString.StartsWith("while"))
                 {
@@ -223,36 +238,38 @@ namespace WindowsFormsApp1
             }
         }
 
-        private (string methodName, string[] parameters) ExtractMethodNameAndParameters(string commandString)
+        
+        public (string methodName, string[] parameters) ExtractMethodNameAndParameters(string commandString)
         {
+
             
-            var parts = commandString.Split(new char[] { ' ' }, 2);
-            var methodName = parts[1].Split(new char[] { ' ' }, 2)[0].Trim();
-            var parametersPart = parts[1].Substring(methodName.Length).Trim();
-            var parameters = parametersPart.Split(',')
-                                           .Select(param => param.Trim())
-                                           .Where(param => !string.IsNullOrEmpty(param))
-                                           .ToArray();
-            return (methodName, parameters);
+                    var parts = commandString.Split(new char[] { ' ' }, 2);
+                    var methodName = parts[1].Split(new char[] { ' ' }, 2)[0].Trim();
+                    var parametersPart = parts[1].Substring(methodName.Length).Trim();
+                    var parameters = parametersPart.Split(',')
+                                                   .Select(param => param.Trim())
+                                                   .Where(param => !string.IsNullOrEmpty(param))
+                                                   .ToArray();
+                    return (methodName, parameters);
         }
 
-        private string ExtractMethodName(string commandString)
-        {
-            
-            var parts = commandString.Split(' ');
-            return parts[1].Trim();
-        }
 
         private (string methodName, string[] arguments) ExtractMethodCallDetails(string commandString)
         {
-            
+            // Assuming this function is only called for lines that start with "call"
+            if (!commandString.StartsWith("call"))
+            {
+                throw new InvalidOperationException("Command is not a method call.");
+            }
+
+            commandString = commandString.Substring(4).Trim(); // Remove 'call' keyword
             var parts = commandString.Split(new char[] { ' ' }, 2);
-            var methodName = parts[1].Split(new char[] { ' ' }, 2)[0].Trim();
-            var argumentsPart = parts[1].Substring(methodName.Length).Trim();
-            var arguments = argumentsPart.Split(',')
-                                         .Select(arg => arg.Trim())
-                                         .Where(arg => !string.IsNullOrEmpty(arg))
-                                         .ToArray();
+            var methodName = parts[0].Trim();
+
+            string[] arguments = parts.Length > 1
+                                 ? parts[1].Split(',').Select(arg => arg.Trim()).ToArray()
+                                 : new string[0];
+
             return (methodName, arguments);
         }
 
@@ -299,21 +316,21 @@ namespace WindowsFormsApp1
 
 
         }
-  
+
         public void ExecuteScript(string script)
         {
 
             try
             {
-                syntaxChecker.CheckSyntax(script); 
+                syntaxChecker.CheckSyntax(script);
 
-                
+
                 string[] lines = script.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-                currentLineNumber = 0;
+                
                 foreach (var line in lines)
                 {
                     ExecuteCommand(line);
-                    currentLineNumber++;
+                
                 }
             }
             catch (SyntaxException ex)

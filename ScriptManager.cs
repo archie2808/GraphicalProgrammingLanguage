@@ -8,24 +8,37 @@ namespace WindowsFormsApp1
 {
     public class ScriptManager
     {
-        private string[] scriptLines;
+        private List<string> scriptLines;
+        public int currentLineNumber;
 
-        public ScriptManager(string script)
+        public ScriptManager()
         {
-            scriptLines = script.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            scriptLines = new List<string>();
         }
 
-        public string GetCommandFromLine(int line)
+        public void LoadScript(string script)
         {
-            if (line >= 0 && line < scriptLines.Length)
+            scriptLines = script.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+        }
+
+        public string GetLine(int lineNumber)
+        {
+            currentLineNumber = lineNumber; // Update current line number whenever a line is fetched
+            if (lineNumber >= 0 && lineNumber < scriptLines.Count)
             {
-                return scriptLines[line];
+                return scriptLines[lineNumber];
             }
-            else
-            {
-                // Handle the case where the line number is invalid
-                return null;
-            }
+            return null;
+        }
+
+        public int GetCurrentLineNumber()
+        {
+            return currentLineNumber;
+        }
+
+        public int GetTotalLines()
+        {
+            return scriptLines.Count;
         }
     }
 }

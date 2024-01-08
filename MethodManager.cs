@@ -10,73 +10,131 @@ namespace WindowsFormsApp1
     {
         private VariableManager variableManager;
         private CommandParser commandParser;
-        private ScriptManager scriptManager;
         private Dictionary<string, MethodData> methods;
-        private List<string> scriptLines;
-        private int currentLine;
-        private Stack<int> returnStack;
+        private ScriptManager scriptManager;
+       
+        private string currentDefiningMethod;
         private bool methodFlag = false;
+        private List<string> currentMethodCommands;
+        private bool isExecuting = false;
 
-        public MethodManager(VariableManager variableManager)
+        public bool IsExecuting()
         {
-            this.variableManager = new VariableManager();
-            
-            methods = new Dictionary<string, MethodData>();
-            returnStack = new Stack<int>();
-        }
-        public void UpdateScript(string newScript)
-        {
-            this.scriptLines = new List<string>(newScript.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries));
+            return isExecuting;
         }
 
-        public void SetCommandParserLoop(CommandParser commandParser)
+        public MethodManager(VariableManager variableManager, ScriptManager scriptManager, CommandParser commandParser)
         {
+            this.variableManager =  variableManager;
+            this.scriptManager = scriptManager;
             this.commandParser = commandParser;
+            methods = new Dictionary<string, MethodData>();
+            
         }
+       
+
+        
 
         public void DefineMethod(string methodName, int startLine, string[] parameters)
         {
-            methods[methodName] = new MethodData(startLine, -1, parameters);
+            
+            currentDefiningMethod = methodName;
+            methodFlag = true;
+            currentMethodCommands = new List<string>();
+            methods[methodName] = new MethodData(startLine, -1, parameters, currentMethodCommands);
+            Console.WriteLine($"Defining method: {methodName} Start Line: {startLine}");
         }
 
-        public void EndMethodDefinition(string methodName, int endLine)
+        public void EndMethodDefinition(int endLine)
         {
-            if (methods.TryGetValue(methodName, out var methodData))
+            if (string.IsNullOrEmpty(currentDefiningMethod))
+            {
+                throw new InvalidOperationException("No method is currently being defined.");
+            }
+
+            if (methods.TryGetValue(currentDefiningMethod, out var methodData))
             {
                 methodData.EndLine = endLine;
-                methods[methodName] = methodData;
+                methodData.Commands = new List<string>(currentMethodCommands);
+                methods[currentDefiningMethod] = methodData;
+                methodFlag = false;
+                Console.WriteLine($"Ending method definition: {currentDefiningMethod}");
+                currentDefiningMethod = null; // Reset the current method name
+
+               
+                
             }
             else
             {
-                throw new InvalidOperationException($"Method '{methodName}' not defined.");
+                throw new InvalidOperationException($"Method '{currentDefiningMethod}' not defined.");
             }
         }
-
+        public bool IsDefiningMethod { get { return methodFlag; } }
+        public void AddCommand(string command)
+        {
+            if (methodFlag)
+            {
+                currentMethodCommands.Add(command);
+                Console.WriteLine($"Adding command to method {currentDefiningMethod}: {command}");
+            }
+            else
+            {
+                commandParser.ExecuteCommand(command);
+            }
+        }
         public void CallMethod(string methodName, string[] arguments)
         {
             if (methods.TryGetValue(methodName, out var method))
             {
-
+                variableManager.PushScope(); // Enter new local scope
                 MapArgumentsToParameters(arguments, method.Parameters);
-                returnStack.Push(currentLine);
-                currentLine = method.StartLine;
 
-                for (int i = method.StartLine; i <= method.EndLine; i++)
+                isExecuting = true;
+
+                foreach (var command in method.Commands)
                 {
-                    string command = GetCommandFromLine(i);
-                    if (!string.IsNullOrEmpty(command))
+                    if (!string.IsNullOrWhiteSpace(command))
                     {
                         commandParser.ExecuteCommand(command);
                     }
                 }
 
-                currentLine = returnStack.Pop();
+                variableManager.PopScope(); // Exit local scope
+                isExecuting = false;
             }
             else
             {
                 throw new InvalidOperationException($"Method '{methodName}' not found.");
             }
         }
+
+
+        /*public void ExecuteMethod(string methodName, string[] arguments)
+        {
+            if (!methods.TryGetValue(methodName, out var method))
+            {
+                throw new InvalidOperationException($"Method '{methodName}' not found.");
+            }
+
+            
+            methodFlag = false;
+            
+            
+            variableManager.PushScope(); // Create a new local scope for the method
+            
+            
+            MapArgumentsToParameters(arguments, method.Parameters);
+
+            // Execute each command in the method's command list
+            foreach (var command in method.Commands)
+            {
+                commandParser.ExecuteCommand(command);
+            }
+
+            // Cleanup after method execution
+            variableManager.PopScope(); // Exit the local scope
+            methodFlag = false; // Reset the method flag
+        }*/
 
         private void MapArgumentsToParameters(string[] arguments, string[] parameters)
         {
@@ -93,6 +151,7 @@ namespace WindowsFormsApp1
                 {
                     variableManager.SetVariable(paramName, intValue);
                 }
+                
                 else if (variableManager.IsVariableDefined(argValue))
                 {
                     int varValue = variableManager.GetVariable(argValue);
@@ -105,32 +164,36 @@ namespace WindowsFormsApp1
             }
         }
 
-        public string GetCommandFromLine(int line)
-        {
-            
-            if (line >= 0 && line < scriptLines.Count)
-            {
-                return scriptLines[line];
-            }
-            else
-            {
-                // Handle the case where the line number is invalid
-                return null;
-            }
-        }
+       
 
         public struct MethodData
         {
             public int StartLine;
             public int EndLine;
             public string[] Parameters;
+            public List<string> Commands; // New attribute to store the commands of the method
 
-            public MethodData(int startLine, int endLine, string[] parameters)
+            public MethodData(int startLine, int endLine, string[] parameters, List<string> commands)
             {
                 StartLine = startLine;
                 EndLine = endLine;
                 Parameters = parameters;
+                Commands = commands ?? new List<string>(); // Initialize with an empty list if null
             }
         }
+
+        public List<string> GetMethodCommands(string methodName)
+        {
+            if (methods.TryGetValue(methodName, out var methodData))
+            {
+                return methodData.Commands;
+            }
+            else
+            {
+                throw new InvalidOperationException($"Method '{methodName}' not found.");
+            }
+        }
+      
     }
+
 }

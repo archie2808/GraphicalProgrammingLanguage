@@ -22,7 +22,7 @@ namespace WindowsFormsApp1
         private string defaultDirectory;
         private IfStatementManager ifStatementManager;
         private LoopManager loopManager;
-        private SyntaxChecker syntaxChecker;
+        //private SyntaxChecker syntaxChecker;
        
 
         /// <summary>
@@ -41,10 +41,12 @@ namespace WindowsFormsApp1
             ifStatementManager = new IfStatementManager(variableManager);
             ifStatementManager.IfExMsg += updateUI;
             loopManager = new LoopManager(variableManager);
-            commandParser = new CommandParser(textBox2, drawingSurface, variableManager, ifStatementManager, loopManager );
+            ScriptManager scriptManager = new ScriptManager();
+            commandParser = new CommandParser(textBox2, drawingSurface, variableManager, ifStatementManager, loopManager, scriptManager );
             ifStatementManager.SetCommandParserIf(commandParser);
             loopManager.SetCommandParserLoop(commandParser);
-            syntaxChecker = new SyntaxChecker(variableManager);
+            MethodManager methodManager = new MethodManager(variableManager, scriptManager, commandParser);
+            //syntaxChecker = new SyntaxChecker(variableManager);
             defaultDirectory = @"C:\Users\archi\OneDrive - Leeds Beckett University\YEAR 3\ASE\SCRIPTS";
             
         }
@@ -144,7 +146,7 @@ namespace WindowsFormsApp1
             try
             {
                 string script = textBox2.Text;
-                syntaxChecker.CheckSyntax(script);
+                //syntaxChecker.CheckSyntax(script);
                 errorLabel.Text = "Syntax looks good!";
                    
             }

@@ -12,9 +12,31 @@ namespace WindowsFormsApp1
     /// </summary>
     public class VariableManager
     {
-        
-        private Dictionary<string, int> variables = new Dictionary<string, int>();
 
+        private Stack<Dictionary<string, int>> scopes;
+
+        public VariableManager()
+        {
+            scopes = new Stack<Dictionary<string, int>>();
+            scopes.Push(new Dictionary<string, int>()); // Global scope
+        }
+
+        public void PushScope()
+        {
+            scopes.Push(new Dictionary<string, int>()); // New local scope
+        }
+
+        public void PopScope()
+        {
+            if (scopes.Count > 1)
+            {
+                scopes.Pop();
+            }
+            else
+            {
+                throw new InvalidOperationException("Cannot pop global scope.");
+            }
+        }
         /// <summary>
         /// Responsible for assinging variable names and their values 
         /// </summary>
@@ -26,12 +48,12 @@ namespace WindowsFormsApp1
         public void ProcessVariableAssignment(string command)
         {
             string[] parts = command.Split('=');
-            string varName = parts[0].Trim();
+            string Name = parts[0].Trim();
             string expression = parts[1].Trim();
 
             int value = EvaluateVarExpression(expression); 
             Console.WriteLine($"Processing variable assignment: {command}");
-            SetVariable(varName, value); 
+            SetVariable(Name, value); 
         }
         /// <summary>
         /// Evaluates the expression withhin a variable
@@ -88,7 +110,7 @@ namespace WindowsFormsApp1
         {
             
             
-            variables[name] = value;
+            scopes.Peek()[name] = value;
             Console.WriteLine($"Setting variable {name} to {value}");
         }
 
@@ -101,11 +123,13 @@ namespace WindowsFormsApp1
         /// </returns>
         public int GetVariable(string name)
         {
-            if (variables.TryGetValue(name, out int value))
+            foreach (var scope in scopes)
             {
-                return value;
+                if (scope.TryGetValue(name, out int value))
+                {
+                    return value;
+                }
             }
-
             throw new InvalidOperationException($"Variable '{name}' is not defined.");
         }
 
@@ -118,7 +142,7 @@ namespace WindowsFormsApp1
         /// </returns>
         public bool IsVariableDefined(string name)
         {
-            return variables.ContainsKey(name);
+            return scopes.Any(scope => scope.ContainsKey(name));
         }
 
         private int ResolveArgumentToInteger(string arg)

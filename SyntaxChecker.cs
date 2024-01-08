@@ -281,7 +281,7 @@ namespace WindowsFormsApp1
         private void ValidateExpressionSyntax(string expression, int lineNumber)
         {
           
-            var tokens = Regex.Split(expression, @"([+\-*/])").Where(t => t != string.Empty).ToArray();
+            var tokens = Regex.Split(expression, @"([+\-*///])").Where(t => t != string.Empty).ToArray();
 
             foreach (var token in tokens)
             {

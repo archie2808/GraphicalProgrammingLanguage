@@ -10,7 +10,7 @@ namespace ProgramTesting
     public class SyntaxCheckerTests
     {
         private VariableManager variableManager;
-        private SyntaxChecker syntaxChecker;
+        //private SyntaxChecker syntaxChecker;
 
         [TestInitialize]
         public void Setup()
