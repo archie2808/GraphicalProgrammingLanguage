@@ -226,29 +226,39 @@ namespace WindowsFormsApp1
         /// <param name="index">The starting index of the loop in the script.</param>
         private void CheckLoopSyntax(string[] lines, ref int index)
         {
+            int loopDepth = 1;
+            index++;  // Move past the current 'while' line
 
-            string loopStartLine = lines[index];
-            if (!IsValidLoopStart(loopStartLine))
+            while (index < lines.Length && loopDepth > 0)
             {
-                throw new SyntaxException($"Line {index + 1}: Invalid loop start.");
+                string line = lines[index].Trim().ToLower();
+
+                if (line.StartsWith("while"))
+                {
+                    loopDepth++;  // Found a nested loop, increase depth
+                }
+                else if (line.StartsWith("endwhile"))
+                {
+                    loopDepth--;  // Found the end of a loop, decrease depth
+                }
+                else if (loopDepth > 0)
+                {
+                    // Validate the syntax of the current line here, but skip for 'while' and 'endwhile'
+                    if (!line.StartsWith("while") && !line.StartsWith("endwhile"))
+                    {
+                        IsValidSyntax(lines[index], index + 1);
+                    }
+                }
+
+                index++;  // Move to the next line
             }
 
-            index++;
-
-            while (index < lines.Length && !lines[index].Trim().ToLower().Equals("endwhile"))
-            {
-
-                IsValidSyntax(lines[index], index + 1);
-                index++;
-            }
-
-            if (index == lines.Length || !lines[index].Trim().ToLower().Equals("endwhile"))
+            if (loopDepth != 0)
             {
                 throw new SyntaxException("Loop not properly closed with 'endwhile'.");
             }
-
-
         }
+
 
         /// <summary>
         /// Checks the syntax of an if statement construct.

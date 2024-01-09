@@ -28,13 +28,13 @@ y = 100
 num1 = 25
 num2 = 25
 while num1 < 2000
-	moveto x y
-	circle num1
-	while num2 < 100
-		triangle num2 num1 num1
-		num2 = num2 + 25
-		x = x + 5
-	endwhile
+moveto x y
+circle num1
+while num2 < 100
+triangle num2 num1 num1
+num2 = num2 + 25
+x = x + 5
+endwhile
 num2 = 25
 num1 = num1 + 25
 y = y + 5

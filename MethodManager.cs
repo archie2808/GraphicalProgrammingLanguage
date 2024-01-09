@@ -98,13 +98,25 @@ namespace WindowsFormsApp1
             if (methods.TryGetValue(methodName, out var method))
             {
                 variableManager.PushScope(); // Enter new local scope
+
+                // First Pass: Process only variable assignments
+                foreach (var command in method.Commands)
+                {
+                    if (command.Contains("="))
+                    {
+                        variableManager.ProcessVariableAssignment(command);
+                    }
+                }
+
+                // Map arguments to parameters after variables are set
                 MapArgumentsToParameters(arguments, method.Parameters);
 
                 isExecuting = true;
 
+                // Second Pass: Execute all commands
                 foreach (var command in method.Commands)
                 {
-                    if (!string.IsNullOrWhiteSpace(command))
+                    if (!command.Contains("=")) // Skip variable assignments as they are already processed
                     {
                         commandParser.ExecuteCommand(command);
                     }
@@ -118,6 +130,7 @@ namespace WindowsFormsApp1
                 throw new InvalidOperationException($"Method '{methodName}' not found.");
             }
         }
+
 
         private void MapArgumentsToParameters(string[] arguments, string[] parameters)
         {
