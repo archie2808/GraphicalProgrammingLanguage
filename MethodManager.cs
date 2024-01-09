@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace WindowsFormsApp1
-{
-    public class MethodManager
+﻿
+//namespace WindowsFormsApp1
+/*{
+    /*public class MethodManager
     {
         private VariableManager variableManager;
         private CommandParser commandParser;
@@ -134,7 +129,7 @@ namespace WindowsFormsApp1
             // Cleanup after method execution
             variableManager.PopScope(); // Exit the local scope
             methodFlag = false; // Reset the method flag
-        }*/
+        }
 
         private void MapArgumentsToParameters(string[] arguments, string[] parameters)
         {
@@ -196,4 +191,4 @@ namespace WindowsFormsApp1
       
     }
 
-}
+} */

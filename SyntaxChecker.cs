@@ -14,7 +14,7 @@ namespace WindowsFormsApp1
     /// </summary>
     public class SyntaxChecker
     {
-        
+
         private VariableManager variableManager;
 
         public SyntaxChecker(VariableManager variableManager)
@@ -67,7 +67,7 @@ namespace WindowsFormsApp1
 
             if (line.Contains("="))
             {
-                
+
                 ValidateVariableAssignmentSyntax(line, lineNumber);
                 return true;
             }
@@ -107,7 +107,7 @@ namespace WindowsFormsApp1
                     ValidateArgumentsCount(arguments, 1, lineNumber, commandName);
                     break;
 
-              
+
 
                 default:
                     throw new SyntaxException($"Line {lineNumber}: Unknown command '{commandName}'.");
@@ -146,18 +146,18 @@ namespace WindowsFormsApp1
         /// <param name="index">The starting index of the loop in the script.</param>
         private void CheckLoopSyntax(string[] lines, ref int index)
         {
-           
+
             string loopStartLine = lines[index];
             if (!IsValidLoopStart(loopStartLine))
             {
                 throw new SyntaxException($"Line {index + 1}: Invalid loop start.");
             }
 
-            index++; 
+            index++;
 
             while (index < lines.Length && !lines[index].Trim().ToLower().Equals("endwhile"))
             {
-                
+
                 IsValidSyntax(lines[index], index + 1);
                 index++;
             }
@@ -167,7 +167,7 @@ namespace WindowsFormsApp1
                 throw new SyntaxException("Loop not properly closed with 'endwhile'.");
             }
 
-           
+
         }
 
         /// <summary>
@@ -177,7 +177,7 @@ namespace WindowsFormsApp1
         /// <param name="index">The starting index of the if statement in the script.</param>
         private void CheckIfSyntax(string[] lines, ref int index)
         {
-            
+
             string ifStartLine = lines[index];
             if (!IsValidIfStart(ifStartLine))
             {
@@ -198,7 +198,7 @@ namespace WindowsFormsApp1
                 throw new SyntaxException("If statement not properly closed with 'endif'.");
             }
 
-            
+
         }
 
         /// <summary>
@@ -208,11 +208,11 @@ namespace WindowsFormsApp1
         /// <returns>True if the loop is valid.</returns
         private bool IsValidLoopStart(string line)
         {
-          
+
             string[] parts = line.Trim().Split(new char[] { ' ' }, 2);
             if (parts.Length < 2 || !parts[0].ToLower().Equals("while"))
             {
-                return false; 
+                return false;
             }
 
             string condition = parts[1];
@@ -228,15 +228,15 @@ namespace WindowsFormsApp1
         /// <returns>True if the if start is valid.</returns
         private bool IsValidIfStart(string line)
         {
-            
+
             string[] parts = line.Trim().Split(new char[] { ' ' }, 2);
             if (parts.Length < 2 || !parts[0].ToLower().Equals("if"))
             {
-                return false; 
+                return false;
             }
 
             string condition = parts[1];
-           
+
 
             return true;
         }
@@ -280,15 +280,15 @@ namespace WindowsFormsApp1
         /// <param name="lineNumber"></param>
         private void ValidateExpressionSyntax(string expression, int lineNumber)
         {
-          
-            var tokens = Regex.Split(expression, @"([+\-*///])").Where(t => t != string.Empty).ToArray();
+
+            var tokens = Regex.Split(expression, @"([+\-*/])").Where(t => t != string.Empty).ToArray();
 
             foreach (var token in tokens)
             {
-               
+
                 var trimmedToken = token.Trim();
 
-                
+
                 if (!int.TryParse(trimmedToken, out _) &&
                     !IsValidVariableName(trimmedToken) &&
                     !IsValidOperator(trimmedToken))
@@ -308,6 +308,6 @@ namespace WindowsFormsApp1
             return Regex.IsMatch(variableName, @"^[a-zA-Z_][a-zA-Z0-9_]*$");
         }
 
-        
+
     }
 }

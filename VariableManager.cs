@@ -51,9 +51,9 @@ namespace WindowsFormsApp1
             string Name = parts[0].Trim();
             string expression = parts[1].Trim();
 
-            int value = EvaluateVarExpression(expression); 
+            int value = EvaluateVarExpression(expression);
             Console.WriteLine($"Processing variable assignment: {command}");
-            SetVariable(Name, value); 
+            SetVariable(Name, value);
         }
         /// <summary>
         /// Evaluates the expression withhin a variable
@@ -63,7 +63,7 @@ namespace WindowsFormsApp1
         private int EvaluateVarExpression(string expression)
         {
             // Split expression into tokens considering various operators
-            var tokens = Regex.Split(expression, @"([+\-*/])").Where(t => t != string.Empty).ToArray();
+            var tokens = Regex.Split(expression, @"([+\-*/])").Where(t => !string.IsNullOrWhiteSpace(t)).Select(t => t.Trim()).ToArray();
             int result = ResolveArgumentToInteger(tokens[0]);
 
             for (int i = 1; i < tokens.Length; i += 2)
@@ -108,10 +108,24 @@ namespace WindowsFormsApp1
         /// </remarks>
         public void SetVariable(string name, int value)
         {
+            bool variableSet = false;
+            foreach (var scope in scopes)
+            {
+                if (scope.ContainsKey(name))
+                {
+                    scope[name] = value;
+                    Console.WriteLine($"Variable '{name}' set to {value} in local scope.");
+                    variableSet = true;
+                    break;
+                }
+            }
+            if (!variableSet)
+            {
+                scopes.Last()[name] = value;
+                Console.WriteLine($"Variable '{name}' set to {value} in global scope.");
+            }
+            // If variable not found in any scope, create it in the global scope (or throw an error)
             
-            
-            scopes.Peek()[name] = value;
-            Console.WriteLine($"Setting variable {name} to {value}");
         }
 
         /// <summary>
@@ -160,7 +174,99 @@ namespace WindowsFormsApp1
                 throw new InvalidOperationException($"difficulty resolving argument of type String to type Int: {arg}");
             }
         }
-
-
     }
 }
+
+
+
+        /// <summary>
+        /// Responsible for assinging variable names and their values 
+        /// </summary>
+        /// <param name="command"></param>
+        /// <remarks>
+        /// The Method is called when the '=' operator is detected in a statement, the method will assign the string value to the varible name and the integer to the variables value, 
+        /// variables are stored in a dictionary
+        /// </remarks>
+/*public void ProcessVariableAssignment(string command)
+  {
+      string[] parts = command.Split('=');
+      string varName = parts[0].Trim();
+      string expression = parts[1].Trim();
+
+      int value = EvaluateVarExpression(expression);
+      Console.WriteLine($"Processing variable assignment: {command}");
+      SetVariable(varName, value);
+  }
+
+  private int EvaluateVarExpression(string expression)
+  {
+      string[] tokens = expression.Split(new char[] { ' ', '+' }, StringSplitOptions.RemoveEmptyEntries);
+      int result = 0;
+
+      foreach (string token in tokens)
+      {
+          result += ResolveArgumentToInteger(token);
+      }
+
+      return result;
+  }
+
+
+  /// <summary>
+  /// Responsible for setting the new variable value 
+  /// </summary>
+  /// <param name="name"></param>
+  /// <param name="value"></param>
+  /// <remarks>
+  /// If the var does not exist, it will be created, if the var already exists, it will be updates with the new value
+  /// </remarks>
+  public void SetVariable(string name, int value)
+  {
+
+
+      variables[name] = value;
+      Console.WriteLine($"Setting variable {name} to {value}");
+  }
+
+  /// <summary>
+  /// Resposible for retriving the value of a specified variable
+  /// </summary>
+  /// <param name="name"></param>
+  /// <returns>
+  /// The integer value of the variable
+  /// </returns>
+  public int GetVariable(string name)
+  {
+      if (variables.TryGetValue(name, out int value))
+      {
+          return value;
+      }
+
+      throw new InvalidOperationException($"Variable '{name}' is not defined.");
+  }
+
+  /// <summary>
+  /// Checks if a variable with the specified name is already defined, without retrieving its value.
+  /// </summary>
+  /// <param name="name"></param>
+  /// <returns>
+  /// True if the var already exists
+  /// </returns>
+  public bool IsVariableDefined(string name)
+  {
+      return variables.ContainsKey(name);
+  }
+
+  private int ResolveArgumentToInteger(string arg)
+  {
+      if (IsVariableDefined(arg))
+          return GetVariable(arg);
+      else if (int.TryParse(arg, out int result))
+          return result;
+
+      throw new InvalidOperationException($"bruh {arg}");
+  } 
+
+
+}
+}    */

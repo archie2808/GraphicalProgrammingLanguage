@@ -52,11 +52,11 @@ endwhile
 moveto 100 100
 num1 = 25
 while num1 < 200
-	circle num1
-	if num1 < 100
-		triangle num1 num1
-	endif
-	num1 = num1 + 25
+circle num1
+if num1 < 100
+triangle num1 num1 num1
+endif
+num1 = num1 + 25
 endwhile
 
 num1 = 100

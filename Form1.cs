@@ -22,8 +22,6 @@ namespace WindowsFormsApp1
         private string defaultDirectory;
         private IfStatementManager ifStatementManager;
         private LoopManager loopManager;
-        //private SyntaxChecker syntaxChecker;
-       
 
         /// <summary>
         /// Initialized a new instance of the <c>Form1</c> class
@@ -41,14 +39,11 @@ namespace WindowsFormsApp1
             ifStatementManager = new IfStatementManager(variableManager);
             ifStatementManager.IfExMsg += updateUI;
             loopManager = new LoopManager(variableManager);
-            ScriptManager scriptManager = new ScriptManager();
-            commandParser = new CommandParser(textBox2, drawingSurface, variableManager, ifStatementManager, loopManager, scriptManager );
+            commandParser = new CommandParser(textBox2, drawingSurface, variableManager, ifStatementManager, loopManager);
             ifStatementManager.SetCommandParserIf(commandParser);
             loopManager.SetCommandParserLoop(commandParser);
-            MethodManager methodManager = new MethodManager(variableManager, scriptManager, commandParser);
-            //syntaxChecker = new SyntaxChecker(variableManager);
             defaultDirectory = @"C:\Users\archi\OneDrive - Leeds Beckett University\YEAR 3\ASE\SCRIPTS";
-            
+
         }
 
         private void updateUI(string message)
@@ -85,7 +80,7 @@ namespace WindowsFormsApp1
 
         }
 
-       
+
         private void Form1_Load(object sender, EventArgs e)
         {
 
@@ -105,7 +100,7 @@ namespace WindowsFormsApp1
         {
             try
             {
-                string command = textBox1.Text.Trim().ToLower(); 
+                string command = textBox1.Text.Trim().ToLower();
 
                 if (command == "clear")
                 {
@@ -138,31 +133,17 @@ namespace WindowsFormsApp1
             pictureBox1.Image = drawingSurface;
             pictureBox1.Refresh();
             commandParser.UpdateDrawingSurface(drawingSurface);
-            
+
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            try
-            {
-                string script = textBox2.Text;
-                //syntaxChecker.CheckSyntax(script);
-                errorLabel.Text = "Syntax looks good!";
-                   
-            }
-            catch (SyntaxException ex)
-            {
-                errorLabel.Text =$"Syntax error: {ex.Message}";
-            }
-            catch (Exception ex)
-            {
-                errorLabel.Text = $"Execution error: {ex.Message}";
-            }
-        }                            
+
+        }
 
         private void pictureBox1_Click(object sender, EventArgs e)
         {
-            
+
         }
         /// <summary>
         /// Handles the Paint event of the picture box control
@@ -187,7 +168,7 @@ namespace WindowsFormsApp1
         /// If so, it retrieves the program commands from textBox2 and executes them using CommandParser</remarks>
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
-            
+
         }
 
         private void textBox2_TextChanged(object sender, EventArgs e)
@@ -195,7 +176,7 @@ namespace WindowsFormsApp1
 
         }
 
-    
+
         /// <summary>
         /// Handles the key down event of textBox1
         /// </summary>
@@ -261,3 +242,6 @@ namespace WindowsFormsApp1
         }
     }
 }
+
+    
+    
