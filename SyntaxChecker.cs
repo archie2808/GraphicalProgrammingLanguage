@@ -16,10 +16,12 @@ namespace WindowsFormsApp1
     {
 
         private VariableManager variableManager;
+        private MethodManager methodManager;
 
-        public SyntaxChecker(VariableManager variableManager)
+        public SyntaxChecker(VariableManager variableManager, MethodManager methodManager)
         {
             this.variableManager = variableManager;
+            this.methodManager = methodManager;
         }
 
         /// <summary>
@@ -44,6 +46,18 @@ namespace WindowsFormsApp1
                 else if (line.StartsWith("if"))
                 {
                     CheckIfSyntax(lines, ref i); // i will be updated to the end of the if statement
+                }
+                else if (line.StartsWith("method"))
+                {
+                    CheckMethodDeclaration(lines, ref i);
+                }
+                else if (line.StartsWith("endmethod"))
+                {
+                    CheckMethodDeclaration(lines, ref i);
+                }
+                else if (line.StartsWith("call"))
+                {
+                    ValidateMethodCallSyntax(line, i + 1);
                 }
                 else
                 {
@@ -115,6 +129,72 @@ namespace WindowsFormsApp1
 
             return true;
         }
+        /// <summary>
+        /// Checks the method starts with call and that the variable name exisits
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="lineNumber"></param>
+        private void ValidateMethodCallSyntax(string line, int lineNumber)
+        {
+            var parts = line.Split(new char[] { ' ' }, 2);
+            if (parts.Length != 2 || !parts[0].ToLower().Equals("call"))
+            {
+                throw new SyntaxException($"Line {lineNumber}: Method call must start with 'call'.");
+            }
+
+         
+
+            
+           
+        }
+
+
+        /// <summary>
+        /// checks method declaration for method and end method keyword aswell as verifying correct method names and parmaters
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="lineNumber"></param>
+        private void CheckMethodDeclaration(string[] lines, ref int index)
+        {
+            var parts = lines[index].Split(new char[] { ' ' }, 3);
+
+            if (parts[0].ToLower().Equals("method"))
+            {
+                if (parts.Length < 3)
+                {
+                    throw new SyntaxException($"Line {index + 1}: Incomplete method declaration.");
+                }
+
+                string methodName = parts[1];
+                if (!Regex.IsMatch(methodName, @"^[a-zA-Z][a-zA-Z0-9_]*$"))
+                {
+                    throw new SyntaxException($"Line {index + 1}: Invalid method name '{methodName}'.");
+                }
+
+                string parametersPart = parts[2];
+                var parameters = parametersPart.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var param in parameters)
+                {
+                    if (!Regex.IsMatch(param.Trim(), @"^[a-zA-Z][a-zA-Z0-9_]*$")) // Simplified regex for parameter names
+                    {
+                        throw new SyntaxException($"Line {index + 1}: Invalid parameter format in '{param.Trim()}'.");
+                    }
+                }
+            }
+            else if (parts[0].ToLower().Equals("endmethod"))
+            {
+                if (parts.Length > 1)
+                {
+                    throw new SyntaxException($"Line {index + 1}: 'endmethod' should not have additional parameters.");
+                }
+                // Logic to handle end of method if needed
+            }
+            else
+            {
+                throw new SyntaxException($"Line {index + 1}: Expected 'method' or 'endmethod' declaration.");
+            }
+        }
+
 
         /// <summary>
         /// Validates the syntax of a variable assignment.

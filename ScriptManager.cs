@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-/*namespace WindowsFormsApp1
+namespace WindowsFormsApp1
 {
     public class ScriptManager
     {
@@ -16,10 +16,7 @@ using System.Threading.Tasks;
             scriptLines = new List<string>();
         }
 
-        public void LoadScript(string script)
-        {
-            scriptLines = script.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries).ToList();
-        }
+       
 
         public string GetLine(int lineNumber)
         {
@@ -42,4 +39,4 @@ using System.Threading.Tasks;
         }
     }
 }
-    */
+    

@@ -128,10 +128,7 @@ namespace WindowsFormsApp1
         /// </remarks>
         public void DrawRectangle(Point startPosition, int width, int height)
         {
-            if (OutOfBoundsRectangle(startPosition, width, height))
-            {
-                throw new ArgumentException("Rectangle dimensions out of bounds. Redraw rectangle within bounds of the drawing surface.");
-            }
+            
             
             
             using (Graphics g = Graphics.FromImage(drawingSurface))
@@ -140,25 +137,7 @@ namespace WindowsFormsApp1
             }
         }
 
-        /// <summary>
-        /// Checks if the rectangle dimensions exceed the boundaries of the drawing surface
-        /// </summary>
-        /// <param name="startPosition"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <returns>
-        /// Returns true if the rectangle is out of bounds, otherwise fails
-        /// </returns>
-        /// <remarks>
-        /// The method calculates if the rectangle defined by the start position, width and height
-        /// would extend beyond the edges of the drawing surface. It also checks if the start position is negative
-        /// </remarks>
-        private bool OutOfBoundsRectangle(Point startPosition, int width, int height)
-        {
-            return startPosition.X + width > drawingSurface.Width ||
-                   startPosition.Y + height > drawingSurface.Height ||
-                   startPosition.X < 0 || startPosition.Y < 0;
-        }
+    
 
         /// <summary>
         /// Draws a line on the drawing surface from a specified start point to an end point

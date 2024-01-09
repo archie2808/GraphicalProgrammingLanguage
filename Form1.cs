@@ -22,6 +22,9 @@ namespace WindowsFormsApp1
         private string defaultDirectory;
         private IfStatementManager ifStatementManager;
         private LoopManager loopManager;
+        private SyntaxChecker syntaxChecker;
+        private ScriptManager scriptManager;
+        private MethodManager methodManager;
 
         /// <summary>
         /// Initialized a new instance of the <c>Form1</c> class
@@ -39,11 +42,18 @@ namespace WindowsFormsApp1
             ifStatementManager = new IfStatementManager(variableManager);
             ifStatementManager.IfExMsg += updateUI;
             loopManager = new LoopManager(variableManager);
-            commandParser = new CommandParser(textBox2, drawingSurface, variableManager, ifStatementManager, loopManager);
+
+            // Initialize scriptManager here
+            scriptManager = new ScriptManager();
+
+            methodManager = new MethodManager(variableManager, scriptManager, commandParser);
+            syntaxChecker = new SyntaxChecker(variableManager, methodManager);  // Removed the redeclaration
+            commandParser = new CommandParser(errorLabel, drawingSurface, variableManager, ifStatementManager,
+                                              loopManager, scriptManager, syntaxChecker);
+
             ifStatementManager.SetCommandParserIf(commandParser);
             loopManager.SetCommandParserLoop(commandParser);
             defaultDirectory = @"C:\Users\archi\OneDrive - Leeds Beckett University\YEAR 3\ASE\SCRIPTS";
-
         }
 
         private void updateUI(string message)
@@ -138,7 +148,21 @@ namespace WindowsFormsApp1
 
         private void button2_Click(object sender, EventArgs e)
         {
+            try
+            {
+                string script = textBox2.Text;
+                syntaxChecker.CheckSyntax(script);
+                errorLabel.Text = "Syntax looks good!";
 
+            }
+            catch (SyntaxException ex)
+            {
+                errorLabel.Text = $"Syntax error: {ex.Message}";
+            }
+            catch (Exception ex)
+            {
+                errorLabel.Text = $"Execution error: {ex.Message}";
+            }
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)

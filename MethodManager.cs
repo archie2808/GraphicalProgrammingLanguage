@@ -1,13 +1,18 @@
-﻿
-//namespace WindowsFormsApp1
-/*{
-    /*public class MethodManager
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace WindowsFormsApp1
+{
+    public class MethodManager
     {
         private VariableManager variableManager;
         private CommandParser commandParser;
         private Dictionary<string, MethodData> methods;
         private ScriptManager scriptManager;
-       
+
         private string currentDefiningMethod;
         private bool methodFlag = false;
         private List<string> currentMethodCommands;
@@ -18,21 +23,32 @@
             return isExecuting;
         }
 
+        /// <summary>
+        /// Allows exception class to check if method name already exists
+        /// </summary>
+        /// <param name="methodName"></param>
+        /// <returns></returns>
+        public bool IsMethodNameDefined(string methodName)
+        {
+            return methods.ContainsKey(methodName);
+        }
+
+
         public MethodManager(VariableManager variableManager, ScriptManager scriptManager, CommandParser commandParser)
         {
-            this.variableManager =  variableManager;
+            this.variableManager = variableManager;
             this.scriptManager = scriptManager;
             this.commandParser = commandParser;
             methods = new Dictionary<string, MethodData>();
-            
-        }
-       
 
-        
+        }
+
+
+
 
         public void DefineMethod(string methodName, int startLine, string[] parameters)
         {
-            
+
             currentDefiningMethod = methodName;
             methodFlag = true;
             currentMethodCommands = new List<string>();
@@ -56,8 +72,8 @@
                 Console.WriteLine($"Ending method definition: {currentDefiningMethod}");
                 currentDefiningMethod = null; // Reset the current method name
 
-               
-                
+
+
             }
             else
             {
@@ -103,34 +119,6 @@
             }
         }
 
-
-        /*public void ExecuteMethod(string methodName, string[] arguments)
-        {
-            if (!methods.TryGetValue(methodName, out var method))
-            {
-                throw new InvalidOperationException($"Method '{methodName}' not found.");
-            }
-
-            
-            methodFlag = false;
-            
-            
-            variableManager.PushScope(); // Create a new local scope for the method
-            
-            
-            MapArgumentsToParameters(arguments, method.Parameters);
-
-            // Execute each command in the method's command list
-            foreach (var command in method.Commands)
-            {
-                commandParser.ExecuteCommand(command);
-            }
-
-            // Cleanup after method execution
-            variableManager.PopScope(); // Exit the local scope
-            methodFlag = false; // Reset the method flag
-        }
-
         private void MapArgumentsToParameters(string[] arguments, string[] parameters)
         {
             if (arguments.Length != parameters.Length)
@@ -146,7 +134,7 @@
                 {
                     variableManager.SetVariable(paramName, intValue);
                 }
-                
+
                 else if (variableManager.IsVariableDefined(argValue))
                 {
                     int varValue = variableManager.GetVariable(argValue);
@@ -159,7 +147,7 @@
             }
         }
 
-       
+
 
         public struct MethodData
         {
@@ -188,7 +176,7 @@
                 throw new InvalidOperationException($"Method '{methodName}' not found.");
             }
         }
-      
+
     }
 
-} */
+}

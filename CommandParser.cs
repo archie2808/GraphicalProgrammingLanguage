@@ -12,18 +12,23 @@ namespace WindowsFormsApp1
     /// <summary>
     /// The <c>CommandParser</c> class is responsible for interpreting and executing user commands. 
     /// </summary>
-
-
     public class CommandParser
     {
 
         private Bitmap drawingSurface;
-        private TextBox outputTextBox;
+        private Label errorLabel;
+        private MethodManager methodManager;
         private LoopManager loopManager;
         private DrawingManager drawingManager;
         private IfStatementManager ifStatementManager;
         private VariableManager variableManager;
         private Point penPosition;
+        private ScriptManager scriptManager;
+
+        private SyntaxChecker syntaxChecker;
+
+
+
 
 
         /// <summary>
@@ -60,17 +65,21 @@ namespace WindowsFormsApp1
         /// <param name="surface">The Bitmap surface on which drawing commands are executed.</param>
         /// <param name="vm">The variable manager for managing script variables.</param>
         /// <param name="ifStatementManager">The if statement manager for handling conditional commands.</param>
-        public CommandParser(TextBox output, Bitmap surface, VariableManager vm, IfStatementManager ifStatementManager, LoopManager loopManager)
+        public CommandParser(Label errorLabel, Bitmap surface, VariableManager vm, IfStatementManager ifStatementManager, LoopManager loopManager, ScriptManager scriptManager, SyntaxChecker syntaxChecker)
         {
             penPosition = new Point(0, 0);
-            outputTextBox = output;
+            this.errorLabel = errorLabel;
             drawingSurface = surface;
             drawingManager = new DrawingManager(surface);
             variableManager = vm;
+            this.scriptManager = scriptManager;
+            this.methodManager = new MethodManager(variableManager, scriptManager, this);
             this.ifStatementManager = ifStatementManager;
             this.loopManager = loopManager;
             UpdatePenPositionAction = (newPosition) => { penPosition = newPosition; };
-
+            
+            
+            this.syntaxChecker = syntaxChecker; 
         }
 
         //Flag to indicate if we are currently processing commands inside of an if block
@@ -89,28 +98,28 @@ namespace WindowsFormsApp1
         {
             try
             {
-                //Check if the command is the start of an if statement
+
                 if (command.StartsWith("if"))
                 {
-                    //Set the flag to true upon entering if statement
+
                     isInsideIfStatement = true;
-                    //Delegation of logic to IfStatementManager
+
                     ifStatementManager.StartIfStatement(command);
                 }
 
-                //check if the command signifies the end of the if statement
+
                 else if (command == "endif")
                 {
-                    //set flag to false
+
                     isInsideIfStatement = false;
-                    //delegation of logic to IfStatementManager
+
                     ifStatementManager.EndIfStatement(this);
                 }
 
-                //check if we are inside if statement block
+
                 else if (isInsideIfStatement)
                 {
-                    //Add the command to the current if statement block in IfStatementManager
+
                     ifStatementManager.AddCommand(command);
                 }
 
@@ -120,9 +129,9 @@ namespace WindowsFormsApp1
                 }
             }
 
-            catch (Exception ex)
+            catch (SyntaxException ex)
             {
-                outputTextBox.AppendText($"Error Processing command: {ex.Message}\n");
+                errorLabel.Text = $"error Processing command{ex.Message}";
             }
         }
         /// <summary>
@@ -136,55 +145,139 @@ namespace WindowsFormsApp1
         /// </remarks>
         public void ExecuteCommand(string commandString)
         {
-            Console.WriteLine($"executing command: {commandString}");
 
-            commandString = commandString.Trim();
-            if (string.IsNullOrEmpty(commandString))
+            try
             {
-                throw new InvalidOperationException("no command to execute");
+                Console.WriteLine($"executing command: {commandString}");
 
-            }
-
-            if (commandString.StartsWith("while"))
-            {
-                loopManager.StartLoop(commandString);
-            }
-            else if (commandString.Trim().ToLower() == "endwhile")
-            {
-                loopManager.EndLoop();
-            }
-
-            else if (loopManager.IsLoopActive)
-            {
-                // We are inside a loop, add the command to the loop command list
-                loopManager.AddCommandToLoop(commandString);
-            }
-
-            else
-            {
-                if (commandString == "reset")
+                commandString = commandString.Trim();
+                if (string.IsNullOrEmpty(commandString))
                 {
-                    ResetCommand();
-                    return;
+                    throw new InvalidOperationException("no command to execute");
+                }
+                // Increment line number for each command
+                if (commandString.StartsWith("call"))
+                {
+                    if (methodManager.IsExecuting() && commandString.StartsWith("call"))
+                    {
+                        // Skip execution of 'call' command within method execution context
+                        return;
+                    }
+
+                    var (methodName, arguments) = ExtractMethodCallDetails(commandString);
+                    //ProcessMethodVariableAssignments(methodName);
+                    methodManager.CallMethod(methodName, arguments);
                 }
 
-                if (commandString.Contains("="))
+                // Handling different types of commands...
+                else if (commandString.StartsWith("method"))
                 {
-                    variableManager.ProcessVariableAssignment(commandString);
-
-                    return;
+                    var (methodName, parameters) = ExtractMethodNameAndParameters(commandString);
+                    int startLine = scriptManager.GetCurrentLineNumber(); // Assuming this method returns the current line number
+                    methodManager.DefineMethod(methodName, startLine, parameters);
+                }
+                else if (commandString.StartsWith("endmethod"))
+                {
+                    int endLine = scriptManager.GetCurrentLineNumber();
+                    methodManager.EndMethodDefinition(endLine);
+                }
+                else if (methodManager.IsDefiningMethod)
+                {
+                    methodManager.AddCommand(commandString);
                 }
 
 
-                if (commandString.StartsWith("if") || commandString == "endif" || isInsideIfStatement)
+                else if (commandString.StartsWith("while"))
                 {
-                    IfStatementExecution(commandString);
-                    return;
+                    loopManager.StartLoop(commandString);
+                }
+                else if (commandString.Trim().ToLower() == "endwhile")
+                {
+                    loopManager.EndLoop();
                 }
 
-                ExecuteSingleCommand(commandString);
+                else if (loopManager.IsLoopActive)
+                {
+                    loopManager.AddCommandToLoop(commandString);
+                }
+
+                else
+                {
+
+
+                    if (commandString == "reset")
+                    {
+                        ResetCommand();
+                        return;
+                    }
+
+                    if (commandString.Contains("="))
+                    {
+                        variableManager.ProcessVariableAssignment(commandString);
+
+                        return;
+                    }
+
+
+                    if (commandString.StartsWith("if") || commandString == "endif" || isInsideIfStatement)
+                    {
+                        IfStatementExecution(commandString);
+                        return;
+                    }
+
+                    ExecuteSingleCommand(commandString);
+                }
+            }
+            catch (SyntaxException ex)
+            {
+                errorLabel.Text = $"Syntax error: {ex.Message}";
+            }
+            catch (Exception ex)
+            {
+                errorLabel.Text = $"Error executing command: {ex.Message}";
             }
 
+        }
+
+
+        public (string methodName, string[] parameters) ExtractMethodNameAndParameters(string commandString)
+        {
+            try
+            {
+                var parts = commandString.Split(new char[] { ' ' }, 2);
+                var methodName = parts[1].Split(new char[] { ' ' }, 2)[0].Trim();
+                var parametersPart = parts[1].Substring(methodName.Length).Trim();
+                var parameters = parametersPart.Split(',')
+                                               .Select(param => param.Trim())
+                                               .Where(param => !string.IsNullOrEmpty(param))
+                                               .ToArray();
+                return (methodName, parameters);
+            }
+            catch (Exception ex)
+            {
+                throw new SyntaxException($"Error extracting method name and parameters: {ex.Message}");
+            }
+        }
+
+
+        private (string methodName, string[] arguments) ExtractMethodCallDetails(string commandString)
+        {
+            try
+            {
+                commandString = commandString.Substring(4).Trim(); // Remove 'call' keyword
+                var parts = commandString.Split(new char[] { ' ' }, 2);
+                var methodName = parts[0].Trim();
+
+                string[] arguments = parts.Length > 1
+                                     ? parts[1].Split(',').Select(arg => arg.Trim()).ToArray()
+                                     : new string[0];
+
+                return (methodName, arguments);
+            }
+            catch (Exception ex)
+            {
+                throw new SyntaxException($"Error extracting method call details: {ex.Message}");
+            }
         }
 
 
@@ -200,30 +293,56 @@ namespace WindowsFormsApp1
         /// </remarks>
         public void ExecuteSingleCommand(string commandString)
         {
-            string[] commandParts = commandString.Split(' ');
-            string action = commandParts[0].ToLower();
-            string[] arguments = commandParts.Skip(1).ToArray();
-
-            if (action != "colour")
+            try
             {
-                for (int i = 1; i < commandParts.Length; i++)
+                string[] commandParts = commandString.Split(' ');
+                string action = commandParts[0].ToLower();
+                string[] arguments = commandParts.Skip(1).ToArray();
+
+                if (action != "colour")
                 {
-                    int resolvedValue = CommandFactory.ResolveArgumentToInteger(commandParts[i], variableManager);
-                    commandParts[i] = resolvedValue.ToString();  // Convert the int back to a string
+                    for (int i = 1; i < commandParts.Length; i++)
+                    {
+                        int resolvedValue = CommandFactory.ResolveArgumentToInteger(commandParts[i], variableManager);
+                        commandParts[i] = resolvedValue.ToString();  // Convert the int back to a string
+                    }
                 }
+                ICommand command = CommandFactory.CreateCommand(action, arguments, drawingManager, variableManager, penPosition, UpdatePenPositionAction);
+                command.Execute();
             }
-            ICommand command = CommandFactory.CreateCommand(action, arguments, drawingManager, variableManager, penPosition, UpdatePenPositionAction);
-            command.Execute();
+            catch (SyntaxException ex)
+            {
+                errorLabel.Text = $"Argument error: {ex.Message}";
+
+            }
+            catch (Exception ex)
+            {
+                errorLabel.Text = $"Error during command execution: {ex.Message}";
+
+            }
+
 
         }
 
         public void ExecuteScript(string script)
         {
-            string[] lines = script.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-            foreach (var line in lines)
+            try
             {
-                ExecuteCommand(line);
+                syntaxChecker.CheckSyntax(script);
+
+
+                string[] lines = script.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (var line in lines)
+                {
+                    ExecuteCommand(line);
+
+                }
+            }
+            catch (SyntaxException ex)
+            {
+                errorLabel.Text = ex.Message;
             }
         }
 
@@ -246,12 +365,11 @@ namespace WindowsFormsApp1
 
             penPosition = new Point(0, 0);
 
-            outputTextBox.AppendText("Pen position reset to top-left corner.\n");
+            errorLabel.Text = "Pen position reset to top-left corner.";
         }
 
 
 
         public UpdatePenPositionDelegate UpdatePenPositionAction { get; set; }
-
     }
 }
